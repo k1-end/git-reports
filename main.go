@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/go-git/go-git/v5"
-	. "github.com/go-git/go-git/v5/_examples"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"golang.org/x/term"
 )
@@ -78,20 +77,33 @@ func (y Tyear) p() {
 	}
 }
 
+
+func checkIfError(err error) {
+	if err == nil {
+		return
+	}
+
+	fmt.Printf("\x1b[31;1m%s\x1b[0m\n", fmt.Sprintf("error: %s", err))
+	os.Exit(1)
+}
+
 func main() {
-	CheckArgs("<path>", "<autho-email>")
+	if len(os.Args) < 3 {
+	    fmt.Printf("\x1b[36;1m%s\x1b[0m\n", fmt.Sprintf("Usage: %s <path> <author-email>", os.Args[0]))
+		os.Exit(1)
+	}
 	path := os.Args[1]
 	mainAuthorEmail := os.Args[2]
 
 	r, err := git.PlainOpen(path)
-	CheckIfError(err)
+	checkIfError(err)
 
 
 	ref, err := r.Head()
-	CheckIfError(err)
+	checkIfError(err)
 
 	cIter, err := r.Log(&git.LogOptions{From: ref.Hash()})
-	CheckIfError(err)
+	checkIfError(err)
 
 	commits := make(map[string]int)
 
