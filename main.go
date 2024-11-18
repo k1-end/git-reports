@@ -11,7 +11,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	. "github.com/go-git/go-git/v5/_examples"
 	"github.com/go-git/go-git/v5/plumbing/object"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 type Tday struct {
@@ -31,7 +31,7 @@ type Tyear struct {
 
 func (y Tyear) p() {
 	fmt.Println(y.Year)
-	width, _, _ := terminal.GetSize(0)
+	width, _, _ := term.GetSize(0)
 	border := strings.Repeat("-", width)
 	fmt.Println(border)
 	monthW := 7
@@ -67,7 +67,7 @@ func (y Tyear) p() {
 					continue
 				}
 				if d.CommitCount == 0 {
-					fmt.Printf("\x1b[48;2;46;54;45m*\x1b[0m")
+					fmt.Printf("\x1b[48;2;46;54;45m \x1b[0m")
 					continue
 				}
 				fmt.Printf("\x1b[48;2;56;232;21m*\x1b[0m")
