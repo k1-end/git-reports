@@ -123,16 +123,10 @@ func main() {
 		jDate := strings.Split(keys[j], "-")
 
 		iYear, err := strconv.Atoi(iDate[0])
-		if err != nil {
-			fmt.Println("Failed to convert string to integer", err)
-			panic("Failed to convert string to integer")
-		}
+		checkIfError(err)
 
 		jYear, err := strconv.Atoi(jDate[0])
-		if err != nil {
-			fmt.Println("Failed to convert string to integer", err)
-			panic("Failed to convert string to integer")
-		}
+		checkIfError(err)
 
 		if iYear < jYear {
 			return true
@@ -141,16 +135,10 @@ func main() {
 		}
 
 		iMonth, err := strconv.Atoi(iDate[1])
-		if err != nil {
-			fmt.Println("Failed to convert string to integer", err)
-			panic("Failed to convert string to integer")
-		}
+		checkIfError(err)
 
 		jMonth, err := strconv.Atoi(jDate[1])
-		if err != nil {
-			fmt.Println("Failed to convert string to integer", err)
-			panic("Failed to convert string to integer")
-		}
+		checkIfError(err)
 
 		if iMonth < jMonth {
 			return true
@@ -159,16 +147,10 @@ func main() {
 		}
 
 		iDay, err := strconv.Atoi(iDate[2])
-		if err != nil {
-			fmt.Println("Failed to convert string to integer", err)
-			panic("Failed to convert string to integer")
-		}
+		checkIfError(err)
 
 		jDay, err := strconv.Atoi(jDate[2])
-		if err != nil {
-			fmt.Println("Failed to convert string to integer", err)
-			panic("Failed to convert string to integer")
-		}
+		checkIfError(err)
 
 		if iDay < jDay {
 			return true
