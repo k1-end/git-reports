@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -118,46 +117,18 @@ func main() {
 	for k := range commits {
 		keys = append(keys, k)
 	}
+
 	sort.Slice(keys, func(i, j int) bool {
-		iDate := strings.Split(keys[i], "-")
-		jDate := strings.Split(keys[j], "-")
+        timeI, err := time.Parse("2006-1-2", keys[i])
+        checkIfError(err)
+        timeJ, err := time.Parse("2006-1-2", keys[j])
+        checkIfError(err)
 
-		iYear, err := strconv.Atoi(iDate[0])
-		checkIfError(err)
-
-		jYear, err := strconv.Atoi(jDate[0])
-		checkIfError(err)
-
-		if iYear < jYear {
+        if timeI.Before(timeJ) {
 			return true
-		} else if iYear > jYear {
-			return false
-		}
-
-		iMonth, err := strconv.Atoi(iDate[1])
-		checkIfError(err)
-
-		jMonth, err := strconv.Atoi(jDate[1])
-		checkIfError(err)
-
-		if iMonth < jMonth {
-			return true
-		} else if iMonth > jMonth {
-			return false
-		}
-
-		iDay, err := strconv.Atoi(iDate[2])
-		checkIfError(err)
-
-		jDay, err := strconv.Atoi(jDate[2])
-		checkIfError(err)
-
-		if iDay < jDay {
-			return true
-		} else if iDay > jDay {
-			return false
-		}
-		return false
+        } else {
+            return false
+        }
 	})
 
 	firstDate, err := time.Parse("2006-1-2", keys[0])
