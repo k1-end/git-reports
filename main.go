@@ -64,11 +64,12 @@ func (y Tyear) p() {
 					fmt.Print(" ")
 					continue
 				}
+                color := getColor(d.CommitCount)
 				if d.CommitCount == 0 {
-					fmt.Printf("\x1b[48;2;46;54;45m \x1b[0m")
+					fmt.Printf("\x1b[48;2;%sm.\x1b[0m", color)
 					continue
 				}
-				fmt.Printf("\x1b[48;2;56;232;21m*\x1b[0m")
+				fmt.Printf("\x1b[48;2;%sm*\x1b[0m", color)
 			}
 			fmt.Print("|")
 		}
