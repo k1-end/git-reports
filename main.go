@@ -165,8 +165,12 @@ func main() {
 		startDate = startDate.AddDate(0, 0, 1)
 	}
 
-	for _, year := range years {
-		year.p()
-	}
-
+    yearsKey := make([]int, 0, len(years))
+    for k := range years{
+        yearsKey = append(yearsKey, k)
+    }
+    sort.Ints(yearsKey)
+    for _, k := range yearsKey {
+        years[k].p()
+    }
 }
