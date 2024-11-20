@@ -33,7 +33,7 @@ func (y Tyear) p() {
 	border := strings.Repeat("-", width)
 	fmt.Println(border)
 	monthW := 7
-	offset := 0
+	offset := 1
 	for true {
 		if (width+1-offset)%(monthW+1) == 0 {
 			break
