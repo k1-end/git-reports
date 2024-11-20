@@ -40,43 +40,53 @@ func (y Tyear) p() {
 		}
 		offset++
 	}
-	for m := time.January; m <= time.December; m++ {
-		value, ok := y.Tmonths[m]
-		if !ok {
-			continue
-		}
-		fmt.Print("  ")
-		fmt.Print(value.Month.String()[0:3])
-		fmt.Print("  |")
-	}
 
-	fmt.Println()
-
-	for i := 0; i < 5; i++ {
-		for m := time.January; m <= time.December; m++ {
-			value, ok := y.Tmonths[m]
-			if !ok {
-				continue
-			}
-			for j := i*7 + 1; j < (i+1)*7+1; j++ {
-				d, ok := value.Tdays[j]
-				if !ok {
-					fmt.Print(" ")
-					continue
-				}
-                color := getColor(d.CommitCount)
-                var char string
-				if d.CommitCount == 0 {
-                    char = "."
-				}else{
-                    char = "*"
+    monthPerLine := (width+1-offset)/(monthW+1)
+    monthIndex := 1
+    lineIndex := 1
+    for monthIndex < 13 {
+        for monthIndex <= lineIndex * monthPerLine && monthIndex < 13 {
+            value, ok := y.Tmonths[time.Month(monthIndex)]
+            if !ok {
+                monthIndex = monthIndex + 1
+                continue
+            }
+            fmt.Print("  ")
+            fmt.Print(value.Month.String()[0:3])
+            fmt.Print("  |")
+            monthIndex = monthIndex + 1
+        }
+        fmt.Println()
+        for i := 0; i < 5; i++ {
+            monthIndex = monthPerLine * (lineIndex - 1) + 1
+            for monthIndex <= lineIndex * monthPerLine && monthIndex < 13 {
+                value, ok := y.Tmonths[time.Month(monthIndex)]
+                if !ok {
+                    monthIndex = monthIndex + 1
+                    continue
                 }
-				fmt.Printf("\x1b[48;2;%sm%s\x1b[0m", color, char)
-			}
-			fmt.Print("|")
-		}
-		fmt.Println()
-	}
+                for j := i*7 + 1; j < (i+1)*7+1; j++ {
+                    d, ok := value.Tdays[j]
+                    if !ok {
+                        fmt.Print(" ")
+                        continue
+                    }
+                    color := getColor(d.CommitCount)
+                    var char string
+                    if d.CommitCount == 0 {
+                        char = "."
+                    }else{
+                        char = "*"
+                    }
+                    fmt.Printf("\x1b[48;2;%sm%s\x1b[0m", color, char)
+                }
+                fmt.Print("|")
+                monthIndex = monthIndex + 1
+            }
+            fmt.Println()
+        }
+        lineIndex =  lineIndex + 1
+    }
 }
 
 
