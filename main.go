@@ -32,7 +32,7 @@ func (y Tyear) p() {
 	width, _, _ := term.GetSize(0)
 	border := strings.Repeat("-", width)
 	fmt.Println(border)
-	monthW := 7
+	monthW := 6
 	offset := 1
 	for true {
 		if (width+1-offset)%(monthW+1) == 0 {
@@ -53,11 +53,11 @@ func (y Tyear) p() {
             }
             fmt.Print("  ")
             fmt.Print(value.Month.String()[0:3])
-            fmt.Print("  |")
+            fmt.Print(" |")
             monthIndex = monthIndex + 1
         }
         fmt.Println()
-        for i := 0; i < 5; i++ {
+        for i := 0; i < 7; i++ {
             monthIndex = monthPerLine * (lineIndex - 1) + 1
             for monthIndex <= lineIndex * monthPerLine && monthIndex < 13 {
                 value, ok := y.Tmonths[time.Month(monthIndex)]
@@ -65,8 +65,10 @@ func (y Tyear) p() {
                     monthIndex = monthIndex + 1
                     continue
                 }
-                for j := i*7 + 1; j < (i+1)*7+1; j++ {
-                    d, ok := value.Tdays[j]
+                firstWeekDay := value.Tdays[1].Date.Weekday()
+                for j := 1; j < 7; j++ {
+                    dayIndex := 7 * j - int(firstWeekDay) - 6 + i
+                    d, ok := value.Tdays[dayIndex]
                     if !ok {
                         fmt.Print(" ")
                         continue
