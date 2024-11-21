@@ -27,13 +27,23 @@ type Tyear struct {
 	Year    int
 }
 
+var shortDayNames = []string{
+	"Sun",
+	"Mon",
+	"Tue",
+	"Wed",
+	"Thu",
+	"Fri",
+	"Sat",
+}
+
 func (y Tyear) p() {
 	fmt.Println(y.Year)
 	width, _, _ := term.GetSize(0)
 	border := strings.Repeat("-", width)
 	fmt.Println(border)
 	monthW := 6
-	offset := 1
+	offset := 1 + 5
 	for true {
 		if (width+1-offset)%(monthW+1) == 0 {
 			break
@@ -45,6 +55,7 @@ func (y Tyear) p() {
     monthIndex := 1
     lineIndex := 1
     for monthIndex < 13 {
+        fmt.Print("     ")
         for monthIndex <= lineIndex * monthPerLine && monthIndex < 13 {
             value, ok := y.Tmonths[time.Month(monthIndex)]
             if !ok {
@@ -59,6 +70,8 @@ func (y Tyear) p() {
         fmt.Println()
         for i := 0; i < 7; i++ {
             monthIndex = monthPerLine * (lineIndex - 1) + 1
+            fmt.Print(shortDayNames[i])
+            fmt.Print(": ")
             for monthIndex <= lineIndex * monthPerLine && monthIndex < 13 {
                 value, ok := y.Tmonths[time.Month(monthIndex)]
                 if !ok {
