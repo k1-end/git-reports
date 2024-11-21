@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"sort"
@@ -27,6 +28,17 @@ type Tyear struct {
 	Year    int
 }
 
+func (y Tyear) getFirstMonth() (time.Month, error){
+    for i := 1; i < 13; i++ {
+        _, ok := y.Tmonths[time.Month(i)]
+        if ok {
+            return time.Month(i), nil
+        }
+    }
+    return time.Month(0), errors.New("empty name")
+}
+
+
 var shortDayNames = []string{
 	"Sun",
 	"Mon",
@@ -52,11 +64,15 @@ func (y Tyear) p() {
 	}
 
     monthPerLine := (width+1-offset)/(monthW+1)
-    monthIndex := 1
+    firstMonth, err := y.getFirstMonth()
+    if err != nil {
+        return
+    }
+    monthIndex := int(firstMonth)
     lineIndex := 1
     for monthIndex < 13 {
         fmt.Print("     ")
-        for monthIndex <= lineIndex * monthPerLine && monthIndex < 13 {
+        for monthIndex - int(firstMonth) + 1 <= lineIndex * monthPerLine && monthIndex < 13 {
             value, ok := y.Tmonths[time.Month(monthIndex)]
             if !ok {
                 monthIndex = monthIndex + 1
@@ -72,7 +88,7 @@ func (y Tyear) p() {
             monthIndex = monthPerLine * (lineIndex - 1) + 1
             fmt.Print(shortDayNames[i])
             fmt.Print(": ")
-            for monthIndex <= lineIndex * monthPerLine && monthIndex < 13 {
+            for monthIndex  - int(firstMonth) + 1 <= lineIndex * monthPerLine && monthIndex < 13 {
                 value, ok := y.Tmonths[time.Month(monthIndex)]
                 if !ok {
                     monthIndex = monthIndex + 1
