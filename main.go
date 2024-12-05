@@ -54,7 +54,7 @@ func (y Tyear) p() {
     fmt.Println()
 	newHeader := pterm.HeaderPrinter{
 		TextStyle:       pterm.NewStyle(pterm.FgBlack),
-		BackgroundStyle: pterm.NewStyle(pterm.BgLightMagenta),
+		BackgroundStyle: pterm.NewStyle(pterm.BgLightGreen),
 		Margin:          20,
 	}
 
