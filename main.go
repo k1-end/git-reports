@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/pterm/pterm"
 	"golang.org/x/term"
 )
 
@@ -50,7 +51,14 @@ var shortDayNames = []string{
 }
 
 func (y Tyear) p() {
-	fmt.Println(y.Year)
+    fmt.Println()
+	newHeader := pterm.HeaderPrinter{
+		TextStyle:       pterm.NewStyle(pterm.FgBlack),
+		BackgroundStyle: pterm.NewStyle(pterm.BgLightMagenta),
+		Margin:          20,
+	}
+
+	newHeader.WithFullWidth().Println(y.Year)
 	width, _, _ := term.GetSize(0)
 	border := strings.Repeat("-", width)
 	fmt.Println(border)
