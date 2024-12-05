@@ -87,15 +87,15 @@ func (y Tyear) p() {
                 continue
             }
             fmt.Print("  ")
-            fmt.Print(value.Month.String()[0:3])
-            fmt.Print(" |")
+            pterm.DefaultBasicText.Print(pterm.Green(value.Month.String()[0:3]))
+            pterm.DefaultBasicText.Print(pterm.Yellow(" |"))
             monthIndex = monthIndex + 1
         }
         fmt.Println()
         for i := 0; i < 7; i++ {
             monthIndex = monthPerLine * (lineIndex - 1) + 1
-            fmt.Print(shortDayNames[i])
-            fmt.Print(": ")
+            pterm.DefaultBasicText.Print(pterm.Blue(shortDayNames[i]))
+            pterm.DefaultBasicText.Print(pterm.Yellow(": "))
             for monthIndex  - int(firstMonth) + 1 <= lineIndex * monthPerLine && monthIndex < 13 {
                 value, ok := y.Tmonths[time.Month(monthIndex)]
                 if !ok {
@@ -119,7 +119,7 @@ func (y Tyear) p() {
                     }
                     fmt.Printf("\x1b[48;2;%sm%s\x1b[0m", color, char)
                 }
-                fmt.Print("|")
+                pterm.DefaultBasicText.Print(pterm.Yellow("|"))
                 monthIndex = monthIndex + 1
             }
             fmt.Println()
