@@ -59,12 +59,12 @@ func (y Tyear) p() {
 	}
 
 	newHeader.WithFullWidth().Println(y.Year)
-	width, _, _ := term.GetSize(0)
+	width, _, _ := term.GetSize(int(os.Stdout.Fd()))
 	border := strings.Repeat("-", width)
 	fmt.Println(border)
 	monthW := 6
 	offset := 1 + 5
-	for true {
+	for {
 		if (width+1-offset)%(monthW+1) == 0 {
 			break
 		}
