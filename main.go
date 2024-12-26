@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
-	"strings"
+	// "strings"
 	"time"
 
 	"github.com/go-git/go-git/v5"
@@ -55,13 +55,13 @@ func (y Tyear) p() {
 	newHeader := pterm.HeaderPrinter{
 		TextStyle:       pterm.NewStyle(pterm.FgBlack),
 		BackgroundStyle: pterm.NewStyle(pterm.BgLightGreen),
-		Margin:          20,
+		// Margin:          20,
 	}
 
 	newHeader.WithFullWidth().Println(y.Year)
 	width, _, _ := term.GetSize(int(os.Stdout.Fd()))
-	border := strings.Repeat("-", width)
-	fmt.Println(border)
+	// border := strings.Repeat("-", width)
+	// fmt.Println(border)
 	monthW := 6
 	offset := 1 + 5
 	for {
@@ -150,7 +150,7 @@ func main() {
 
 	commits := make(map[string]int)
 
-	err = cIter.ForEach(func(c *object.Commit) error {
+	_ = cIter.ForEach(func(c *object.Commit) error {
 		if c.Author.Email == mainAuthorEmail {
 			year, month, date := c.Author.When.Local().Date()
 			key := fmt.Sprintf("%d-%d-%d", year, month, date)
@@ -183,10 +183,10 @@ func main() {
         }
 	})
 
-	firstDate, err := time.Parse("2006-1-2", keys[0])
+	firstDate, _ := time.Parse("2006-1-2", keys[0])
 	startDate := time.Date(firstDate.Year(), firstDate.Month(), 1, 0, 0, 0, 0, firstDate.Location())
 
-	lastDate, err := time.Parse("2006-1-2", keys[len(keys)-1])
+	lastDate, _ := time.Parse("2006-1-2", keys[len(keys)-1])
 	endDate := time.Date(lastDate.Year(), lastDate.Month(), 1, 0, 0, 0, 0, lastDate.Location()).AddDate(0, 1, -1)
 
 	years := make(map[int]Tyear)
