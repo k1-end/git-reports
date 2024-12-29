@@ -149,6 +149,7 @@ var rootCmd = &cobra.Command{
 		checkIfError(err)
 
 		commits := make(map[string]int)
+		commitsPerDev := make(map[string]int)
 
 		_ = cIter.ForEach(func(c *object.Commit) error {
 			if developerEmail != "_"{
@@ -164,7 +165,14 @@ var rootCmd = &cobra.Command{
 			} else {
 				commits[key]++
 			}
-			// }
+
+			_, exists = commitsPerDev[c.Author.Name]
+			if !exists {
+				commitsPerDev[c.Author.Name] = 1
+			} else {
+				commitsPerDev[c.Author.Name]++
+			}
+
 			return nil
 		})
 
@@ -230,6 +238,29 @@ var rootCmd = &cobra.Command{
 		for _, k := range yearsKey {
 			years[k].p()
 		}
+
+
+        authorNames := make([]string, 0, len(commitsPerDev))
+
+		for k := range commitsPerDev {
+			authorNames = append(authorNames, k)
+		}
+
+
+        sort.SliceStable(authorNames , func(i, j int) bool{
+            return commitsPerDev[authorNames[i]] > commitsPerDev[authorNames[j]]
+        })
+
+
+        var barData []pterm.Bar
+        var bar pterm.Bar
+        for _, authorName := range authorNames {
+            bar.Label = authorName
+            bar.Value = commitsPerDev[authorName]
+            barData = append(barData, bar)
+            // fmt.Println(authorName, commitCount)
+        }
+        pterm.DefaultBarChart.WithBars(barData).WithHorizontal().Render()
 	},
 }
 
