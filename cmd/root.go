@@ -128,15 +128,16 @@ func (y Tyear) p() {
 	}
 }
 
+var developerEmail string
+
 var rootCmd = &cobra.Command{
-	Use:   "git-reports",
+	Use:   "git-reports <path>",
 	Short: "Visualize git reports",
 	Long:  "Visualize git reports",
 	Args: cobra.ExactArgs(1),
 	
 	Run: func(cmd *cobra.Command, args []string) {
 		path := args[0]
-		// mainAuthorEmail := os.Args[2]
 
 		r, err := git.PlainOpen(path)
 		checkIfError(err)
@@ -150,7 +151,11 @@ var rootCmd = &cobra.Command{
 		commits := make(map[string]int)
 
 		_ = cIter.ForEach(func(c *object.Commit) error {
-			// if c.Author.Email == mainAuthorEmail {
+			if developerEmail != "_"{
+                if c.Author.Email != developerEmail {
+                    return nil
+                }
+            }
 			year, month, date := c.Author.When.Local().Date()
 			key := fmt.Sprintf("%d-%d-%d", year, month, date)
 			_, exists := commits[key]
@@ -162,6 +167,11 @@ var rootCmd = &cobra.Command{
 			// }
 			return nil
 		})
+
+        if len(commits) == 0 {
+            fmt.Println("No commits where found!")
+            os.Exit(1)
+        }
 
 		keys := make([]string, 0, len(commits))
 
@@ -224,6 +234,8 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
+    rootCmd.PersistentFlags().StringVar(&developerEmail, "dev", "_", "choose developer by email")
+
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
