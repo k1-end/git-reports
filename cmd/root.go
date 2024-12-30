@@ -176,7 +176,7 @@ var rootCmd = &cobra.Command{
 				commitsPerDev[c.Author.Name]++
 			}
 
-            commitsPerHour[c.Author.When.UTC().Hour()]++
+            commitsPerHour[c.Author.When.Local().Hour()]++
 
 			return nil
 		})
@@ -263,8 +263,10 @@ var rootCmd = &cobra.Command{
             bar.Label = authorName
             bar.Value = commitsPerDev[authorName]
             barData = append(barData, bar)
-            // fmt.Println(authorName, commitCount)
         }
+        
+        fmt.Println()
+        pterm.DefaultHeader.WithBackgroundStyle(pterm.NewStyle(pterm.BgGreen)).Println("Commit count per developer")
         pterm.DefaultBarChart.WithBars(barData).WithHorizontal().Render()
 
 
