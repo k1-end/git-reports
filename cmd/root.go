@@ -4,11 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
+
+	"sort"
+	"time"
 
 	"github.com/pterm/pterm"
 	"golang.org/x/term"
-	"sort"
-	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
@@ -150,6 +152,7 @@ var rootCmd = &cobra.Command{
 
 		commits := make(map[string]int)
 		commitsPerDev := make(map[string]int)
+        var commitsPerHour [24]int
 
 		_ = cIter.ForEach(func(c *object.Commit) error {
 			if developerEmail != "_"{
@@ -172,6 +175,8 @@ var rootCmd = &cobra.Command{
 			} else {
 				commitsPerDev[c.Author.Name]++
 			}
+
+            commitsPerHour[c.Author.When.UTC().Hour()]++
 
 			return nil
 		})
@@ -261,6 +266,18 @@ var rootCmd = &cobra.Command{
             // fmt.Println(authorName, commitCount)
         }
         pterm.DefaultBarChart.WithBars(barData).WithHorizontal().Render()
+
+
+        
+        var hourData []pterm.Bar
+        var hour pterm.Bar
+	    for i := 1; i < 24; i++ {
+            hour.Label = strconv.Itoa(i)
+            hour.Value = commitsPerHour[i]
+            hourData = append(hourData, hour)
+        }
+        pterm.DefaultHeader.WithBackgroundStyle(pterm.NewStyle(pterm.BgGreen)).Println("Commits per hour of day (local)")
+        pterm.DefaultBarChart.WithShowValue().WithBars(hourData).WithHorizontal().WithWidth(100).Render()
 	},
 }
 
