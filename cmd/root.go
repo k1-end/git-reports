@@ -59,6 +59,7 @@ var commitCountRange = []string{
 }
 
 func commitCountGuide() {
+	fmt.Println()
 	commitCount := 0
 	pterm.DefaultBasicText.Print(pterm.Blue("commits count guide:"))
 	for i := 0; i < len(commitCountRange); i++ {
@@ -79,7 +80,6 @@ func (y Tyear) p() {
 	}
 
 	newHeader.WithFullWidth().Println(y.Year)
-	commitCountGuide()
 	width, _, _ := term.GetSize(int(os.Stdout.Fd()))
 	// border := strings.Repeat("-", width)
 	// fmt.Println(border)
@@ -281,6 +281,7 @@ var rootCmd = &cobra.Command{
 			barData = append(barData, bar)
 		}
 
+		commitCountGuide()
 		fmt.Println()
 		pterm.DefaultHeader.WithBackgroundStyle(pterm.NewStyle(pterm.BgGreen)).Println("Commit count per developer")
 		err = pterm.DefaultBarChart.WithBars(barData).WithHorizontal().WithWidth(90).WithShowValue().Render()
