@@ -50,30 +50,23 @@ var shortDayNames = []string{
 }
 
 var commitCountRange = []string{
-	"0    ",
-	"1-5  ",
-	"6-10 ",
-	"11-15",
-	"16-20",
-	"20<  ",
+	"  .0.  ",
+	" *1-5* ",
+	"*06-10*",
+	"*11-15*",
+	"*16-20*",
+	" *20<* ",
 }
 
 func commitCountGuide() {
+	fmt.Println()
 	commitCount := 0
-	pterm.DefaultBasicText.Println(pterm.Blue("commits count guide:"))
+	pterm.DefaultBasicText.Print(pterm.Blue("commits count guide:"))
 	for i := 0; i < len(commitCountRange); i++ {
-		pterm.DefaultBasicText.Print(pterm.Blue(commitCountRange[i]))
-		pterm.DefaultBasicText.Print(pterm.Yellow("=> "))
 		commitCount = i * 5
 		color := getColor(commitCount)
-		var char string
-		if commitCount == 0 {
-			char = " . "
-		} else {
-			char = " * "
-		}
-		fmt.Printf("\x1b[48;2;%sm%s\x1b[0m", color, char)
-		fmt.Println()
+		var char = commitCountRange[i]
+		pterm.DefaultBasicText.Printf(" \x1b[48;2;%sm%s\x1b[0m ", color, pterm.Red(char))
 	}
 	fmt.Println()
 }
@@ -87,7 +80,6 @@ func (y Tyear) p() {
 	}
 
 	newHeader.WithFullWidth().Println(y.Year)
-	commitCountGuide()
 	width, _, _ := term.GetSize(int(os.Stdout.Fd()))
 	// border := strings.Repeat("-", width)
 	// fmt.Println(border)
@@ -289,6 +281,7 @@ var rootCmd = &cobra.Command{
 			barData = append(barData, bar)
 		}
 
+		commitCountGuide()
 		fmt.Println()
 		pterm.DefaultHeader.WithBackgroundStyle(pterm.NewStyle(pterm.BgGreen)).Println("Commit count per developer")
 		err = pterm.DefaultBarChart.WithBars(barData).WithHorizontal().WithWidth(90).WithShowValue().Render()
