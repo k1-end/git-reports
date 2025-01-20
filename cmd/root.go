@@ -3,15 +3,19 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"sort"
+	"strconv"
+	"time"
+
+	// "github.com/gabriel-vasile/mimetype"
+
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
-	"os"
-	"sort"
-	"strconv"
-	"time"
 )
 
 type Tday struct {
@@ -297,6 +301,47 @@ var rootCmd = &cobra.Command{
 		pterm.DefaultHeader.WithBackgroundStyle(pterm.NewStyle(pterm.BgGreen)).Println("Commits per hour of day (local)")
 		err = pterm.DefaultBarChart.WithShowValue().WithBars(hourData).WithHorizontal().WithWidth(100).Render()
 		checkIfError(err)
+
+		//Iterate over all commited files
+		headRef, err := r.Head()
+
+		commit, err := r.CommitObject(headRef.Hash())
+
+		fIter, err := commit.Files()
+		fileTypeMap := make(map[string]int)
+		fIter.ForEach(func(f *object.File) error {
+			mtype := filepath.Ext(f.Name)
+			if _, exists := fileTypeMap[mtype]; !exists {
+				fileTypeMap[mtype] = int(f.Size)
+			} else {
+				fileTypeMap[mtype] = fileTypeMap[mtype] + int(f.Size)
+			}
+			return nil
+		})
+
+		mimeTypes := make([]string, 0, len(fileTypeMap))
+
+		for k := range fileTypeMap {
+			mimeTypes = append(mimeTypes, k)
+		}
+
+		sort.SliceStable(mimeTypes, func(i, j int) bool {
+			return fileTypeMap[mimeTypes[i]] > fileTypeMap[mimeTypes[j]]
+		})
+
+		var fileTypeData []pterm.Bar
+		var fileType pterm.Bar
+		for k := range mimeTypes {
+			fileType.Label = mimeTypes[k]
+			v := int(fileTypeMap[mimeTypes[k]] / 1000000)
+			if v == 0 {
+				continue
+			}
+			fileType.Value = v
+			fileTypeData = append(fileTypeData, fileType)
+		}
+		pterm.DefaultHeader.WithBackgroundStyle(pterm.NewStyle(pterm.BgGreen)).Println("File Types (MB)")
+		err = pterm.DefaultBarChart.WithShowValue().WithBars(fileTypeData).WithHorizontal().WithWidth(100).Render()
 	},
 }
 
