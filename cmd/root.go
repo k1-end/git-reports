@@ -342,14 +342,14 @@ var rootCmd = &cobra.Command{
 		var fileType pterm.Bar
 		for k := range mimeTypes {
 			fileType.Label = mimeTypes[k]
-			v := int(fileTypeMap[mimeTypes[k]] / 1000000)
+			v := int(fileTypeMap[mimeTypes[k]] / 1000)
 			if v == 0 {
 				continue
 			}
 			fileType.Value = v
 			fileTypeData = append(fileTypeData, fileType)
 		}
-		pterm.DefaultHeader.WithBackgroundStyle(pterm.NewStyle(pterm.BgGreen)).Println("File Types (MB)")
+		pterm.DefaultHeader.WithBackgroundStyle(pterm.NewStyle(pterm.BgGreen)).Println("File Types (KB)")
 		err = pterm.DefaultBarChart.WithShowValue().WithBars(fileTypeData).WithHorizontal().WithWidth(100).Render()
 
 
