@@ -175,6 +175,7 @@ var rootCmd = &cobra.Command{
 
 		commits := make(map[string]int)
 		commitsPerDev := make(map[string]int)
+		mergeCommitsPerYear := make(map[int]int)
 		var commitsPerHour [24]int
 
 		_ = cIter.ForEach(func(c *object.Commit) error {
@@ -200,6 +201,14 @@ var rootCmd = &cobra.Command{
 			}
 
 			commitsPerHour[c.Author.When.Local().Hour()]++
+
+            if c.NumParents() > 1 {
+                if _, exists = mergeCommitsPerYear[year]; !exists {
+                    mergeCommitsPerYear[year] = 1
+                } else {
+                    mergeCommitsPerYear[year]++
+                }
+            }
 
 			return nil
 		})
@@ -342,6 +351,25 @@ var rootCmd = &cobra.Command{
 		}
 		pterm.DefaultHeader.WithBackgroundStyle(pterm.NewStyle(pterm.BgGreen)).Println("File Types (MB)")
 		err = pterm.DefaultBarChart.WithShowValue().WithBars(fileTypeData).WithHorizontal().WithWidth(100).Render()
+
+
+
+		yearsKey = make([]int, 0, len(mergeCommitsPerYear))
+		for k := range mergeCommitsPerYear {
+			yearsKey = append(yearsKey, k)
+		}
+		sort.Ints(yearsKey)
+		var mergeCommitsPerYearBar []pterm.Bar
+		var mergeCommit pterm.Bar
+        for y := range yearsKey{
+			mergeCommit.Label = strconv.Itoa(yearsKey[y])
+			mergeCommit.Value = mergeCommitsPerYear[yearsKey[y]]
+			mergeCommitsPerYearBar = append(mergeCommitsPerYearBar, mergeCommit)
+		}
+		pterm.DefaultHeader.WithBackgroundStyle(pterm.NewStyle(pterm.BgGreen)).Println("Merge Commits per year")
+		err = pterm.DefaultBarChart.WithShowValue().WithBars(mergeCommitsPerYearBar).WithHorizontal().WithWidth(100).Render()
+		checkIfError(err)
+
 	},
 }
 
