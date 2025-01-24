@@ -3,15 +3,18 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
-	"github.com/spf13/cobra"
 	"github.com/k1-end/git-visualizer/src"
+	"github.com/spf13/cobra"
 )
 
 
 var developerEmail string
+var fromDate string
+var toDate string
 
 var rootCmd = &cobra.Command{
 	Use:   "git-reports <path>",
@@ -21,6 +24,30 @@ var rootCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 		path := args[0]
+
+        var fromTime, toTime time.Time
+        var err error
+        if fromDate != "" {
+			fromTime, err = time.Parse("2006-01-02", fromDate)
+			if err != nil {
+				fmt.Println("Invalid 'from' date format. Please use YYYY-MM-DD.")
+				os.Exit(1)
+			}
+		}
+
+		if toDate != "" {
+			toTime, err = time.Parse("2006-01-02", toDate)
+			if err != nil {
+				fmt.Println("Invalid 'to' date format. Please use YYYY-MM-DD.")
+				os.Exit(1)
+			}
+		}
+
+        // Ensure 'from' is before 'to'
+		if fromDate != "" && toDate != "" && fromTime.After(toTime) {
+			fmt.Println("'from' date must be before 'to' date.")
+			os.Exit(1)
+		}
 
         heatMapReport := report.HeatMapReport{CommitsMap: make(map[string]int) }
         commitsPerDevReport := report.CommitsPerDevReport{CommitsPerDevMap: make(map[string]int)}
@@ -42,6 +69,15 @@ var rootCmd = &cobra.Command{
 				if c.Author.Email != developerEmail {
 					return nil
 				}
+			}
+
+            // Filter by date range
+			commitTime := c.Author.When
+			if fromDate != "" && commitTime.Before(fromTime) {
+				return nil
+			}
+			if toDate != "" && commitTime.After(toTime) {
+				return nil
 			}
 
             heatMapReport.IterationStep(c)
@@ -71,6 +107,8 @@ var rootCmd = &cobra.Command{
 
 func Execute() {
 	rootCmd.PersistentFlags().StringVar(&developerEmail, "dev", "_", "choose developer by email")
+    rootCmd.PersistentFlags().StringVar(&fromDate, "from", "", "Filter commits from this date (format: YYYY-MM-DD)")
+	rootCmd.PersistentFlags().StringVar(&toDate, "to", "", "Filter commits up to this date (format: YYYY-MM-DD)")
 
 	if err := rootCmd.Execute(); err != nil {
 		_, err = fmt.Fprintln(os.Stderr, err)
