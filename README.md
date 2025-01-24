@@ -1,9 +1,9 @@
-# Git Visualizer 🚀
+# Git Reports 🚀
 
 **Visualize Git Repository Activity Like Never Before!**
 
 
-Git Visualizer is a command-line tool written in Go that helps you analyze and visualize key metrics from your Git repositories. Whether you're a developer, team lead, or open-source maintainer, this tool provides actionable insights into commit patterns, developer activity, and more.
+Git Reports is a command-line tool written in Go that helps you analyze and visualize key metrics from your Git repositories. Whether you're a developer, team lead, or open-source maintainer, this tool provides actionable insights into commit patterns, developer activity, and more.
 
 ---
 
@@ -74,7 +74,7 @@ You can combine filters to analyze commits by a specific developer within a date
 
 ---
 
-## 🧑‍💻 Why Use Git Visualizer?
+## 🧑‍💻 Why Use Git Reports?
 
 - **Insightful Metrics**: Gain a deeper understanding of your repository's activity.
 - **Easy to Use**: Simple CLI interface with no dependencies other than Go.
@@ -86,7 +86,7 @@ You can combine filters to analyze commits by a specific developer within a date
 
 ## 🤝 Contributing
 
-We welcome contributions! If you'd like to improve Git Visualizer, please follow these steps:
+We welcome contributions! If you'd like to improve Git Reports, please follow these steps:
 1. Fork the repository.
 2. Create a new branch (`git checkout -b feature/your-feature`).
 3. Commit your changes (`git commit -m 'Add some feature'`).
@@ -103,7 +103,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## ⭐ Star This Project
 
-If you find Git Visualizer useful, please consider giving it a star on GitHub! Your support helps us grow and improve the tool.
+If you find Git Reports useful, please consider giving it a star on GitHub! Your support helps us grow and improve the tool.
 
 [![Star on GitHub](https://img.shields.io/github/stars/k1-end/git-reports?style=social)](https://github.com/k1-end/git-reports)
 
