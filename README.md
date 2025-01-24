@@ -7,6 +7,17 @@ Git Reports is a command-line tool written in Go that helps you analyze and visu
 
 ---
 
+### Sample Output
+![Heatmap](https://i.imgur.com/UsvrfvA.png)
+
+![Commits Per Developer](https://imgur.com/HKATglQ.png)
+
+![Commits Per Hour Of Day](https://imgur.com/26rQknn.png)
+
+![File Types & Merge Commits per year](https://imgur.com/uY0kJQ8.png)
+
+---
+
 ## ✨ Features
 
 - **Heatmap of Commits**: Visualize commit activity over time.
@@ -62,15 +73,6 @@ You can combine filters to analyze commits by a specific developer within a date
 ```bash
 ./git-reports /path/to/your/git/repo --dev developer@example.com --from 2023-01-01 --to 2023-12-31
 ```
-
-### Sample Output
-![Heatmap](https://i.imgur.com/UsvrfvA.png)
-
-![Commits Per Developer](https://imgur.com/HKATglQ.png)
-
-![Commits Per Hour Of Day](https://imgur.com/26rQknn.png)
-
-![File Types & Merge Commits per year](https://imgur.com/uY0kJQ8.png)
 
 ---
 
