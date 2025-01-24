@@ -64,7 +64,7 @@ You can combine filters to analyze commits by a specific developer within a date
 ```
 
 ### Sample Output
-![Heatmap](https://imgur.com/UsvrfvA)
+<blockquote class="imgur-embed-pub" lang="en" data-id="UsvrfvA" data-context="false" ><a href="//imgur.com/UsvrfvA"></a></blockquote><script async src="//s.imgur.com/min/embed.js" charset="utf-8"></script>
 
 ![Commits Per Developer](https://imgur.com/HKATglQ)
 
