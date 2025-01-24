@@ -64,13 +64,13 @@ You can combine filters to analyze commits by a specific developer within a date
 ```
 
 ### Sample Output
-<blockquote class="imgur-embed-pub" lang="en" data-id="UsvrfvA" data-context="false" ><a href="//imgur.com/UsvrfvA"></a></blockquote><script async src="//s.imgur.com/min/embed.js" charset="utf-8"></script>
+![Heatmap](https://i.imgur.com/UsvrfvA.png)
 
-![Commits Per Developer](https://imgur.com/HKATglQ)
+![Commits Per Developer](https://imgur.com/HKATglQ.png)
 
-![Commits Per Hour Of Day](https://imgur.com/26rQknn)
+![Commits Per Hour Of Day](https://imgur.com/26rQknn.png)
 
-![File Types & Merge Commits per year](https://imgur.com/uY0kJQ8)
+![File Types & Merge Commits per year](https://imgur.com/uY0kJQ8.png)
 
 ---
 
