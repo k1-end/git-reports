@@ -27,7 +27,7 @@ Git Visualizer is a command-line tool written in Go that helps you analyze and v
    ```
 3. Build the project:
    ```bash
-   cd git-visualizer
+   cd git-reports
    go build -o git-reports
    ```
 4. Run the tool:
