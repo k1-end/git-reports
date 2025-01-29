@@ -105,11 +105,13 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-func Execute() {
+func init() {
 	rootCmd.PersistentFlags().StringVar(&developerEmail, "dev", "_", "choose developer by email")
     rootCmd.PersistentFlags().StringVar(&fromDate, "from", "", "Filter commits from this date (format: YYYY-MM-DD)")
 	rootCmd.PersistentFlags().StringVar(&toDate, "to", "", "Filter commits up to this date (format: YYYY-MM-DD)")
+}
 
+func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		_, err = fmt.Fprintln(os.Stderr, err)
 		checkIfError(err)
