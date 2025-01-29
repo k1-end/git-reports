@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/k1-end/git-visualizer/cmd/serve"
 	"github.com/k1-end/git-visualizer/src"
 	"github.com/spf13/cobra"
 )
@@ -109,6 +110,8 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&developerEmail, "dev", "_", "choose developer by email")
     rootCmd.PersistentFlags().StringVar(&fromDate, "from", "", "Filter commits from this date (format: YYYY-MM-DD)")
 	rootCmd.PersistentFlags().StringVar(&toDate, "to", "", "Filter commits up to this date (format: YYYY-MM-DD)")
+
+    rootCmd.AddCommand(serve.ServeCmd)
 }
 
 func Execute() {
