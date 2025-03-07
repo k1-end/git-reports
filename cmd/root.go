@@ -8,7 +8,8 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/k1-end/git-visualizer/cmd/serve"
-	"github.com/k1-end/git-visualizer/src"
+	"github.com/k1-end/git-visualizer/src/reportgenerator"
+	"github.com/k1-end/git-visualizer/src/reportprinter"
 	"github.com/spf13/cobra"
 )
 
@@ -50,10 +51,10 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-        heatMapReport := report.HeatMapReport{CommitsMap: make(map[string]int) }
-        commitsPerDevReport := report.CommitsPerDevReport{CommitsPerDevMap: make(map[string]int)}
-        commitsPerHourReport := report.CommitsPerHourReport{CommitsPerHourMap: make([]int, 24)}
-        mergeCommitsPerYearReport := report.MergeCommitsPerYearReport{MergeCommitsPerYearMap: make(map[int]int)}
+        commitCountDateHeatMapGenerator := reportgenerator.CommitCountDateHeatMapGenerator{CommitsMap: make(map[string]int) }
+        commitsPerDevReportGenerator := reportgenerator.CommitsPerDevReportGenerator{CommitsPerDevMap: make(map[string]int)}
+        commitsPerHourReportGenerator := reportgenerator.CommitsPerHourReportGenerator{CommitsPerHourMap: make([]int, 24)}
+        mergeCommitsPerYearReportGenerator := reportgenerator.MergeCommitsPerYearReportGenerator{MergeCommitsPerYearMap: make(map[int]int)}
 
 		r, err := git.PlainOpen(path)
 		checkIfError(err)
@@ -81,28 +82,30 @@ var rootCmd = &cobra.Command{
 				return nil
 			}
 
-            heatMapReport.IterationStep(c)
-            commitsPerDevReport.IterationStep(c)
-            commitsPerHourReport.IterationStep(c)
-            mergeCommitsPerYearReport.IterationStep(c)
+            commitCountDateHeatMapGenerator.IterationStep(c)
+            commitsPerDevReportGenerator.IterationStep(c)
+            commitsPerHourReportGenerator.IterationStep(c)
+            mergeCommitsPerYearReportGenerator.IterationStep(c)
 
 			return nil
 		})
-
-        heatMapReport.Print()
-		fmt.Println()
-        commitsPerDevReport.Print()
-		fmt.Println()
-        commitsPerHourReport.Print()
-		fmt.Println()
-        mergeCommitsPerYearReport.Print()
+        p := reportprinter.ConsolePrinter {}
+        commitCountDateHeatMap:= commitCountDateHeatMapGenerator.GetReport()
+        p.PrintDateHeatMapChart(commitCountDateHeatMap)
+        commitsPerDevReport := commitsPerDevReportGenerator.GetReport()
+        p.PrintLineChart(commitsPerDevReport)
+        commitsPerHourReport := commitsPerHourReportGenerator.GetReport()
+        p.PrintLineChart(commitsPerHourReport)
+        mergeCommitsPerYearReport := mergeCommitsPerYearReportGenerator.GetReport()
+        p.PrintLineChart(mergeCommitsPerYearReport)
 
 		headRef, err := r.Head()
 		commit, err := r.CommitObject(headRef.Hash())
 
-        fileTypeReport := report.FileTypeReport{FileTypeMap: make(map[string]int)}
-        fileTypeReport.Iterate(commit)
-        fileTypeReport.Print()
+        fileTypeReportGenerator := reportgenerator.FileTypeReportGenerator{FileTypeMap: make(map[string]int)}
+        fileTypeReportGenerator.Iterate(commit)
+        fileTypeReport := fileTypeReportGenerator.GetReport()
+        p.PrintLineChart(fileTypeReport)
 	},
 }
 

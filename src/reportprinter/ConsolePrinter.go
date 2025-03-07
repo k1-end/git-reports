@@ -1,4 +1,4 @@
-package report
+package reportprinter
 
 import (
 	"errors"
@@ -7,10 +7,14 @@ import (
 	"sort"
 	"time"
 
-	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/pterm/pterm"
 	"golang.org/x/term"
+	"github.com/k1-end/git-visualizer/src/report"
 )
+
+
+type ConsolePrinter struct {
+}
 
 type Tday struct {
 	CommitCount int
@@ -163,81 +167,69 @@ func (y Tyear) p() {
 	}
 }
 
-type HeatMapReport struct {
-    CommitsMap map[string]int
-}
-
-func (r HeatMapReport) IterationStep(c *object.Commit)  {
-    year, month, date := c.Author.When.Local().Date()
-    key := fmt.Sprintf("%d-%d-%d", year, month, date)
-    _, exists := r.CommitsMap[key]
-    if !exists {
-        r.CommitsMap[key] = 1
-    } else {
-        r.CommitsMap[key]++
+func (p ConsolePrinter) PrintLineChart(c report.Report) {
+    var barData []pterm.Bar
+    var bar pterm.Bar
+    labels := c.GetLabels()
+    data := c.GetData()
+    for i := 0; i < len(labels); i++{
+        bar.Label = labels[i]
+        bar.Value = data[i].IntValue
+        barData = append(barData, bar)
     }
+
+    pterm.DefaultHeader.WithBackgroundStyle(pterm.NewStyle(pterm.BgGreen)).Println(c.GetTitle())
+    _ = pterm.DefaultBarChart.WithBars(barData).WithHorizontal().WithWidth(90).WithShowValue().Render()
 }
 
-func (r HeatMapReport) Print(){
-		if len(r.CommitsMap) == 0 {
-			fmt.Println("No commits where found!")
-			return
-		}
+func (p ConsolePrinter) PrintDateHeatMapChart(c report.Report) {
+    keys := c.GetLabels()
+    data := c.GetData()
+    if len(data) == 0 {
+        fmt.Println("No commits where found!")
+        return
+    }
+    firstDate, _ := time.Parse("2006-1-2", keys[0])
+    startDate := time.Date(firstDate.Year(), firstDate.Month(), 1, 0, 0, 0, 0, firstDate.Location())
 
-		keys := make([]string, 0, len(r.CommitsMap))
+    lastDate, _ := time.Parse("2006-1-2", keys[len(keys)-1])
+    endDate := time.Date(lastDate.Year(), lastDate.Month(), 1, 0, 0, 0, 0, lastDate.Location()).AddDate(0, 1, -1)
 
-		for k := range r.CommitsMap {
-			keys = append(keys, k)
-		}
+    years := make(map[int]Tyear)
+    counter := 0
+    for startDate.Before(endDate) {
+        _, exists := years[startDate.Year()]
+        if !exists {
+            years[startDate.Year()] = Tyear{Tmonths: make(map[time.Month]Tmonth), Year: startDate.Year()}
+        }
 
-		sort.Slice(keys, func(i, j int) bool {
-			timeI, _ := time.Parse("2006-1-2", keys[i])
-			timeJ, _ := time.Parse("2006-1-2", keys[j])
+        _, exists = years[startDate.Year()].Tmonths[startDate.Month()]
+        if !exists {
+            years[startDate.Year()].Tmonths[startDate.Month()] = Tmonth{Tdays: make(map[int]Tday), Month: startDate.Month()}
+        }
 
-			if timeI.Before(timeJ) {
-				return true
-			} else {
-				return false
-			}
-		})
+        tDay, exists := years[startDate.Year()].Tmonths[startDate.Month()].Tdays[startDate.Day()]
+        if !exists {
+            years[startDate.Year()].Tmonths[startDate.Month()].Tdays[startDate.Day()] = Tday{}
+        }
+        tDay.Date = startDate
+        if counter < len(keys) && startDate.Format("2006-1-2") == keys[counter] {
+            tDay.CommitCount = data[counter].IntValue
+            counter += 1 // data does not contain all dates and we are iterating overall dates, so we must increment only when the date matches
+        }else{
+            tDay.CommitCount = 0
+        }
+        years[startDate.Year()].Tmonths[startDate.Month()].Tdays[startDate.Day()] = tDay
+        startDate = startDate.AddDate(0, 0, 1)
+    }
 
-		firstDate, _ := time.Parse("2006-1-2", keys[0])
-		startDate := time.Date(firstDate.Year(), firstDate.Month(), 1, 0, 0, 0, 0, firstDate.Location())
-
-		lastDate, _ := time.Parse("2006-1-2", keys[len(keys)-1])
-		endDate := time.Date(lastDate.Year(), lastDate.Month(), 1, 0, 0, 0, 0, lastDate.Location()).AddDate(0, 1, -1)
-
-		years := make(map[int]Tyear)
-		for startDate.Before(endDate) {
-			_, exists := years[startDate.Year()]
-			if !exists {
-				years[startDate.Year()] = Tyear{Tmonths: make(map[time.Month]Tmonth), Year: startDate.Year()}
-			}
-
-			_, exists = years[startDate.Year()].Tmonths[startDate.Month()]
-			if !exists {
-				years[startDate.Year()].Tmonths[startDate.Month()] = Tmonth{Tdays: make(map[int]Tday), Month: startDate.Month()}
-			}
-
-			tDay, exists := years[startDate.Year()].Tmonths[startDate.Month()].Tdays[startDate.Day()]
-			if !exists {
-				years[startDate.Year()].Tmonths[startDate.Month()].Tdays[startDate.Day()] = Tday{}
-			}
-			tDay.CommitCount = r.CommitsMap[startDate.Format("2006-1-2")]
-			tDay.Date = startDate
-
-			years[startDate.Year()].Tmonths[startDate.Month()].Tdays[startDate.Day()] = tDay
-
-			startDate = startDate.AddDate(0, 0, 1)
-		}
-
-		yearsKey := make([]int, 0, len(years))
-		for k := range years {
-			yearsKey = append(yearsKey, k)
-		}
-		sort.Ints(yearsKey)
-		for _, k := range yearsKey {
-			years[k].p()
-		}
-		commitCountGuide()
+    yearsKey := make([]int, 0, len(years))
+    for k := range years {
+        yearsKey = append(yearsKey, k)
+    }
+    sort.Ints(yearsKey)
+    for _, k := range yearsKey {
+        years[k].p()
+    }
+    commitCountGuide()
 }
