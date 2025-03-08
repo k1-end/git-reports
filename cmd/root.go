@@ -17,6 +17,7 @@ import (
 var developerEmail string
 var fromDate string
 var toDate string
+var printerOption string
 
 var rootCmd = &cobra.Command{
 	Use:   "git-reports <path>",
@@ -50,6 +51,7 @@ var rootCmd = &cobra.Command{
 			fmt.Println("'from' date must be before 'to' date.")
 			os.Exit(1)
 		}
+
 
         commitCountDateHeatMapGenerator := reportgenerator.CommitCountDateHeatMapGenerator{CommitsMap: make(map[string]int) }
         commitsPerDevReportGenerator := reportgenerator.CommitsPerDevReportGenerator{CommitsPerDevMap: make(map[string]int)}
@@ -89,25 +91,36 @@ var rootCmd = &cobra.Command{
 
 			return nil
 		})
-        p := reportprinter.ConsolePrinter {}
         
-        p.RegisterReport(commitCountDateHeatMapGenerator.GetReport())
-        
-        p.RegisterReport(commitsPerDevReportGenerator.GetReport())
-        
-        p.RegisterReport(commitsPerHourReportGenerator.GetReport())
-        
-        p.RegisterReport(mergeCommitsPerYearReportGenerator.GetReport())
-
 		headRef, err := r.Head()
 		commit, err := r.CommitObject(headRef.Hash())
 
         fileTypeReportGenerator := reportgenerator.FileTypeReportGenerator{FileTypeMap: make(map[string]int)}
         fileTypeReportGenerator.Iterate(commit)
-        
-        p.RegisterReport(fileTypeReportGenerator.GetReport())
 
-        p.Print()
+        if printerOption == "" || printerOption == "console" {
+            p := reportprinter.ConsolePrinter{}
+            p.RegisterReport(commitCountDateHeatMapGenerator.GetReport())
+            p.RegisterReport(commitsPerDevReportGenerator.GetReport())
+            p.RegisterReport(commitsPerHourReportGenerator.GetReport())
+            p.RegisterReport(mergeCommitsPerYearReportGenerator.GetReport())
+            p.RegisterReport(fileTypeReportGenerator.GetReport())
+            p.Print()
+        }else if printerOption == "html" {
+            p := reportprinter.HtmlPrinter{}
+            p.RegisterReport(commitCountDateHeatMapGenerator.GetReport())
+            p.RegisterReport(commitsPerDevReportGenerator.GetReport())
+            p.RegisterReport(commitsPerHourReportGenerator.GetReport())
+            p.RegisterReport(mergeCommitsPerYearReportGenerator.GetReport())
+            p.RegisterReport(fileTypeReportGenerator.GetReport())
+            p.Print()
+        }else {
+            fmt.Println("Invalid printer value. Valid values are `console` and `html`")
+            os.Exit(1)
+        }
+
+
+        
 	},
 }
 
@@ -115,6 +128,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&developerEmail, "dev", "_", "choose developer by email")
     rootCmd.PersistentFlags().StringVar(&fromDate, "from", "", "Filter commits from this date (format: YYYY-MM-DD)")
 	rootCmd.PersistentFlags().StringVar(&toDate, "to", "", "Filter commits up to this date (format: YYYY-MM-DD)")
+	rootCmd.PersistentFlags().StringVar(&printerOption, "printer", "", "Printer (default to console)")
 
     rootCmd.AddCommand(serve.ServeCmd)
 }
