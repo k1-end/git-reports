@@ -12,51 +12,6 @@ import (
 	"github.com/k1-end/git-visualizer/src/report"
 )
 
-
-type ConsolePrinter struct {
-}
-
-type Tday struct {
-	CommitCount int
-	Date        time.Time
-}
-
-type Tmonth struct {
-	Month time.Month
-	Tdays map[int]Tday
-}
-
-func getColor(commitCount int) string {
-	if commitCount == 0 {
-		return "178;215;155" // #B2D79B (Light Green)
-	} else if commitCount <= 5 {
-		return "139;195;74" // #8BC34A (Medium Green)
-	} else if commitCount <= 10 {
-		return "34;139;34" // #228B22 (Forest Green)
-	} else if commitCount <= 15 {
-		return "0;100;0" // #006400 (Dark Green)
-	} else if commitCount <= 20 {
-		return "0;128;128" // #008080 (Emerald Green)
-	} else {
-		return "0;64;0" // #004000 (Darker Green)
-	}
-}
-
-type Tyear struct {
-	Tmonths map[time.Month]Tmonth
-	Year    int
-}
-
-func (y Tyear) getFirstMonth() (time.Month, error) {
-	for i := 1; i < 13; i++ {
-		_, ok := y.Tmonths[time.Month(i)]
-		if ok {
-			return time.Month(i), nil
-		}
-	}
-	return time.Month(0), errors.New("empty name")
-}
-
 var shortDayNames = []string{
 	"Sun",
 	"Mon",
@@ -76,6 +31,22 @@ var commitCountRange = []string{
 	" *20<* ",
 }
 
+func getColor(commitCount int) string {
+	if commitCount == 0 {
+		return "178;215;155" // #B2D79B (Light Green)
+	} else if commitCount <= 5 {
+		return "139;195;74" // #8BC34A (Medium Green)
+	} else if commitCount <= 10 {
+		return "34;139;34" // #228B22 (Forest Green)
+	} else if commitCount <= 15 {
+		return "0;100;0" // #006400 (Dark Green)
+	} else if commitCount <= 20 {
+		return "0;128;128" // #008080 (Emerald Green)
+	} else {
+		return "0;64;0" // #004000 (Darker Green)
+	}
+}
+
 func commitCountGuide() {
 	fmt.Println()
 	commitCount := 0
@@ -87,6 +58,34 @@ func commitCountGuide() {
 		pterm.DefaultBasicText.Printf(" \x1b[48;2;%sm%s\x1b[0m ", color, pterm.Red(char))
 	}
 	fmt.Println()
+}
+
+type ConsolePrinter struct {
+}
+
+type Tday struct {
+	CommitCount int
+	Date        time.Time
+}
+
+type Tmonth struct {
+	Month time.Month
+	Tdays map[int]Tday
+}
+
+type Tyear struct {
+	Tmonths map[time.Month]Tmonth
+	Year    int
+}
+
+func (y Tyear) getFirstMonth() (time.Month, error) {
+	for i := 1; i < 13; i++ {
+		_, ok := y.Tmonths[time.Month(i)]
+		if ok {
+			return time.Month(i), nil
+		}
+	}
+	return time.Month(0), errors.New("empty name")
 }
 
 func (y Tyear) p() {
