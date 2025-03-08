@@ -26,6 +26,7 @@ func (rg CommitsPerHourReportGenerator) GetReport() report.Report {
     r.SetData(data)
     r.SetLabels(labels)
     r.SetTitle("Commits per hour of day")
+    r.SetReportType("line_chart")
     return r
 
 }

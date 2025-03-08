@@ -51,5 +51,6 @@ func (rg FileTypeReportGenerator) GetReport() report.Report {
     r.SetTitle("File Types (KB)")
     r.SetData(data)
     r.SetLabels(labels)
+    r.SetReportType("line_chart")
     return r
 }

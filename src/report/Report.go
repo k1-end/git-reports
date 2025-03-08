@@ -10,6 +10,7 @@ type Report struct {
     data []Data
     labels []string
     title string
+    reportType string
 }
 
 func (r *Report) SetTitle(t string) {
@@ -24,6 +25,10 @@ func (r *Report) SetLabels(l []string) {
     r.labels = l
 }
 
+func (r *Report) SetReportType(l string) {
+    r.reportType = l
+}
+
 func (r Report) GetTitle() string {
     return r.title
 }
@@ -36,3 +41,6 @@ func (r Report) GetLabels() []string {
     return r.labels
 }
 
+func (r Report) GetReportType() string {
+    return r.reportType
+}

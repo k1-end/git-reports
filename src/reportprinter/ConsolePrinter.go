@@ -61,6 +61,7 @@ func commitCountGuide() {
 }
 
 type ConsolePrinter struct {
+    reports []report.Report
 }
 
 type Tday struct {
@@ -231,4 +232,19 @@ func (p ConsolePrinter) PrintDateHeatMapChart(c report.Report) {
         years[k].p()
     }
     commitCountGuide()
+}
+
+func (p *ConsolePrinter) RegisterReport(c report.Report) {
+    p.reports = append(p.reports, c)
+}
+
+func (p *ConsolePrinter) Print() {
+    for k := range p.reports {
+        switch p.reports[k].GetReportType() {
+        case "line_chart":
+            p.PrintLineChart(p.reports[k])
+        case "date_heatmap":
+            p.PrintDateHeatMapChart(p.reports[k])
+        }
+    }
 }

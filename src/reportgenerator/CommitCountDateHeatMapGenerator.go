@@ -49,6 +49,7 @@ func (rg CommitCountDateHeatMapGenerator) GetReport() report.Report {
     r.SetData(data)
     r.SetTitle("Commit count heat map")
     r.SetLabels(labels)
+    r.SetReportType("date_heatmap")
     return r
 }
 

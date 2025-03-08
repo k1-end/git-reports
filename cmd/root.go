@@ -90,22 +90,24 @@ var rootCmd = &cobra.Command{
 			return nil
 		})
         p := reportprinter.ConsolePrinter {}
-        commitCountDateHeatMap:= commitCountDateHeatMapGenerator.GetReport()
-        p.PrintDateHeatMapChart(commitCountDateHeatMap)
-        commitsPerDevReport := commitsPerDevReportGenerator.GetReport()
-        p.PrintLineChart(commitsPerDevReport)
-        commitsPerHourReport := commitsPerHourReportGenerator.GetReport()
-        p.PrintLineChart(commitsPerHourReport)
-        mergeCommitsPerYearReport := mergeCommitsPerYearReportGenerator.GetReport()
-        p.PrintLineChart(mergeCommitsPerYearReport)
+        
+        p.RegisterReport(commitCountDateHeatMapGenerator.GetReport())
+        
+        p.RegisterReport(commitsPerDevReportGenerator.GetReport())
+        
+        p.RegisterReport(commitsPerHourReportGenerator.GetReport())
+        
+        p.RegisterReport(mergeCommitsPerYearReportGenerator.GetReport())
 
 		headRef, err := r.Head()
 		commit, err := r.CommitObject(headRef.Hash())
 
         fileTypeReportGenerator := reportgenerator.FileTypeReportGenerator{FileTypeMap: make(map[string]int)}
         fileTypeReportGenerator.Iterate(commit)
-        fileTypeReport := fileTypeReportGenerator.GetReport()
-        p.PrintLineChart(fileTypeReport)
+        
+        p.RegisterReport(fileTypeReportGenerator.GetReport())
+
+        p.Print()
 	},
 }
 

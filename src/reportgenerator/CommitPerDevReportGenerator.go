@@ -39,5 +39,6 @@ func (rg CommitsPerDevReportGenerator) GetReport() report.Report {
     r.SetLabels(keys)
     r.SetData(data)
     r.SetTitle("Commits per developer")
+    r.SetReportType("line_chart")
     return r
 }
