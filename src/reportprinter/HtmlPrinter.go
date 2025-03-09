@@ -3,6 +3,7 @@ package reportprinter
 import (
 	"fmt"
 	"html/template"
+	"math/rand/v2"
 	"os"
 	"sort"
 	"time"
@@ -112,26 +113,141 @@ func (p *HtmlPrinter) RegisterReport(r report.Report) {
     p.reports = append(p.reports, r)
 }
 
+func (p HtmlPrinter) PrintLineChart(c report.Report) {
+    tmpl, err := template.New("HeatMap").Parse(`
+        <div style="width: 800px;"><canvas id="{{.ElementId}}"></canvas></div>
+        <script>
+        new Chart(
+            document.getElementById("{{.ElementId}}"),
+            {
+              type: 'bar',
+              data: {
+                labels: [
+                    {{range .Labels}}
+                        {{.}},
+                    {{end}}
+                ],
+                datasets: [
+                  {
+                    label: '{{.Title}}',
+                    data: [
+                        {{range .Data}}
+                            {{.}},
+                        {{end}}
+                    ],
+                  }
+                ]
+              },
+        options: {
+          scales: {
+            x: {
+              ticks: {
+                display: true,
+                autoSkip: false
+              }
+            }
+          }
+        }
+            }
+          );
+        </script>
+        `)
+    if err != nil{
+        fmt.Println(err)
+        panic(err)
+    }
+    var anon struct{
+        Title string
+        Labels []string
+        Data []int
+        ElementId int
+    }
+    anon.Title = c.GetTitle()
+    anon.Labels = c.GetLabels()
+    var data []int
+    for k := range c.GetData() {
+        data = append(data, c.GetData()[k].IntValue)
+    }
+    anon.Data = data
+    anon.ElementId = rand.IntN(10000000)
+    err = tmpl.Execute(os.Stdout, anon)
+
+    if err != nil{
+        fmt.Println(err)
+        panic(err)
+    }
+}
+
 func (p HtmlPrinter) Print() {
     fmt.Println(`
         <!DOCTYPE html>
-        <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1">
-                <title></title>
-                <link href="css/style.css" rel="stylesheet">
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Git Reports</title>
+        <style>
+                body {
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        background-color: #f4f4f4;
+                        margin: 0;
+                        padding: 0;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        min-height: 100vh;
+                }
+                header {
+                        background-color: #3498db;
+                        color: white;
+                        text-align: center;
+                        padding: 20px 0;
+                        width: 100%;
+                }
+                main {
+                        background-color: white;
+                        padding: 20px;
+                        margin: 20px;
+                        border-radius: 8px;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                        width: 80%;
+                        max-width: 800px;
+                }
+                ul {
+                        list-style-type: none;
+                        padding: 0;
+                }
+                li {
+                        padding: 8px 12px;
+                        border-bottom: 1px solid #eee;
+                }
+                li:last-child {
+                        border-bottom: none;
+                }
+                footer{
+                        background-color: #333;
+                        color: white;
+                        text-align: center;
+                        padding: 10px 0;
+                        width: 100%;
+                        margin-top: auto;
+                }
+        </style>
                 <script src="https://d3js.org/d3.v7.min.js"></script>
                 <script src="https://unpkg.com/cal-heatmap/dist/cal-heatmap.min.js"></script>
                 <link rel="stylesheet" href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css">
+                <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
             </head>
             <body>
+            <script> import Chart from 'chart.js/auto' </script>
             <div id="cal-heatmap"></div>
         `)
     for k := range p.reports {
         switch p.reports[k].GetReportType() {
         case "date_heatmap":
             p.PrintDateHeatMapChart(p.reports[k])
+        case "line_chart":
+            p.PrintLineChart(p.reports[k])
         }
     }
 
