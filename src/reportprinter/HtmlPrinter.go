@@ -64,7 +64,7 @@ func (p HtmlPrinter) printDateHeatMapChart(c report.Report) {
     sort.Ints(yearsKey)
     tmpl, err := template.New("HeatMap").Parse(`
         <script>
-        const data = [
+        var data = [
         {{range .Years}}
             {{range .Tmonths}}
                 {{range .Tdays}}
@@ -74,7 +74,7 @@ func (p HtmlPrinter) printDateHeatMapChart(c report.Report) {
         {{end}}
         ];
 
-        const cal = new CalHeatmap();
+        var cal = new CalHeatmap();
         cal.paint({
         data: { source: data, x: 'date', y: 'value' },
         domain: { type: 'year'},
