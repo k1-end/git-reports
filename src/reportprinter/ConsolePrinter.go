@@ -167,7 +167,7 @@ func (y Tyear) p() {
 	}
 }
 
-func (p ConsolePrinter) PrintLineChart(c report.Report) {
+func (p ConsolePrinter) printLineChart(c report.Report) {
     var barData []pterm.Bar
     var bar pterm.Bar
     labels := c.GetLabels()
@@ -182,7 +182,7 @@ func (p ConsolePrinter) PrintLineChart(c report.Report) {
     _ = pterm.DefaultBarChart.WithBars(barData).WithHorizontal().WithWidth(90).WithShowValue().Render()
 }
 
-func (p ConsolePrinter) PrintDateHeatMapChart(c report.Report) {
+func (p ConsolePrinter) printDateHeatMapChart(c report.Report) {
     keys := c.GetLabels()
     data := c.GetData()
     if len(data) == 0 {
@@ -242,9 +242,9 @@ func (p *ConsolePrinter) Print() {
     for k := range p.reports {
         switch p.reports[k].GetReportType() {
         case "line_chart":
-            p.PrintLineChart(p.reports[k])
+            p.printLineChart(p.reports[k])
         case "date_heatmap":
-            p.PrintDateHeatMapChart(p.reports[k])
+            p.printDateHeatMapChart(p.reports[k])
         }
     }
 }

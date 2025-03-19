@@ -16,7 +16,7 @@ type HtmlPrinter struct {
     reports []report.Report
 }
 
-func (p HtmlPrinter) PrintDateHeatMapChart(c report.Report) {
+func (p HtmlPrinter) printDateHeatMapChart(c report.Report) {
     keys := c.GetLabels()
     data := c.GetData()
     if len(data) == 0 {
@@ -113,7 +113,7 @@ func (p *HtmlPrinter) RegisterReport(r report.Report) {
     p.reports = append(p.reports, r)
 }
 
-func (p HtmlPrinter) PrintLineChart(c report.Report) {
+func (p HtmlPrinter) printLineChart(c report.Report) {
     tmpl, err := template.New("HeatMap").Parse(`
         <div style="width: 800px;"><canvas id="{{.ElementId}}"></canvas></div>
         <script>
@@ -245,9 +245,9 @@ func (p HtmlPrinter) Print() {
     for k := range p.reports {
         switch p.reports[k].GetReportType() {
         case "date_heatmap":
-            p.PrintDateHeatMapChart(p.reports[k])
+            p.printDateHeatMapChart(p.reports[k])
         case "line_chart":
-            p.PrintLineChart(p.reports[k])
+            p.printLineChart(p.reports[k])
         }
     }
 
