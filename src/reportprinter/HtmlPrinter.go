@@ -78,7 +78,7 @@ func (p HtmlPrinter) printDateHeatMapChart(c report.Report) {
         cal.paint({
         data: { source: data, x: 'date', y: 'value' },
         domain: { type: 'year'},
-        subDomain: { type: 'day'},
+        subDomain: { type: 'day', width: 13, height: 13},
         scale: { color: { type: 'linear', domain: [0, 20], range: ['white', 'green'], interpolate: 'hsl',}, },
         verticalOrientation: true,
         date: { 
@@ -180,67 +180,33 @@ func (p HtmlPrinter) printLineChart(c report.Report) {
 
 func (p HtmlPrinter) Print() {
     fmt.Println(`
-        <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Git Reports</title>
-        <style>
-                body {
-                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                        background-color: #f4f4f4;
-                        margin: 0;
-                        padding: 0;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        min-height: 100vh;
-                }
-                header {
-                        background-color: #3498db;
-                        color: white;
-                        text-align: center;
-                        padding: 20px 0;
-                        width: 100%;
-                }
-                main {
-                        background-color: white;
-                        padding: 20px;
-                        margin: 20px;
-                        border-radius: 8px;
-                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                        width: 80%;
-                        max-width: 800px;
-                }
-                ul {
-                        list-style-type: none;
-                        padding: 0;
-                }
-                li {
-                        padding: 8px 12px;
-                        border-bottom: 1px solid #eee;
-                }
-                li:last-child {
-                        border-bottom: none;
-                }
-                footer{
-                        background-color: #333;
-                        color: white;
-                        text-align: center;
-                        padding: 10px 0;
-                        width: 100%;
-                        margin-top: auto;
-                }
-        </style>
-                <script src="https://d3js.org/d3.v7.min.js"></script>
-                <script src="https://unpkg.com/cal-heatmap/dist/cal-heatmap.min.js"></script>
-                <link rel="stylesheet" href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css">
-                <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
-            </head>
-            <body>
-            <script> import Chart from 'chart.js/auto' </script>
-            <div id="cal-heatmap"></div>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+        <meta name="generator" content="Hugo 0.84.0">
+        <title>Dashboard Template · Bootstrap v5.0</title>
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+        </head>
+    <body>
+
+        <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+            <a class="navbar-brand col-md-12 me-0 px-3 text-center" href="#">Company name</a>
+        </header>
+
+        <div class="container-fluid p-5">
+            <div class="row">
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                    <script src="https://d3js.org/d3.v7.min.js"></script>
+                    <script src="https://unpkg.com/cal-heatmap/dist/cal-heatmap.min.js"></script>
+                    <link rel="stylesheet" href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css">
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+                    <div style="width: 800px;" id="cal-heatmap"></div>
         `)
     for k := range p.reports {
         switch p.reports[k].GetReportType() {
@@ -252,7 +218,13 @@ func (p HtmlPrinter) Print() {
     }
 
     fmt.Println(`
-            </body>
-        </html>
+                </main>
+            </div>
+        </div>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    </body>
+</html>
         `)
 }
