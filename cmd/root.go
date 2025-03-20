@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
-	"github.com/k1-end/git-visualizer/cmd/serve"
 	"github.com/k1-end/git-visualizer/src/reportgenerator"
 	"github.com/k1-end/git-visualizer/src/reportprinter"
 	"github.com/spf13/cobra"
@@ -21,13 +20,12 @@ var toDate string
 var printerOption string
 
 var rootCmd = &cobra.Command{
-	Use:   "git-reports <path>",
+	Use:   "git-reports [path]",
 	Short: "Visualize git reports",
-	Long:  "Visualize git reports",
-	Args:  cobra.ExactArgs(1),
+	Long:  "Visualize git repository at path (default to current directory)",
+	Args:  cobra.RangeArgs(0, 1),
 
 	Run: func(cmd *cobra.Command, args []string) {
-		path := args[0]
 
         var fromTime, toTime time.Time
         var err error
@@ -59,7 +57,12 @@ var rootCmd = &cobra.Command{
         commitsPerHourReportGenerator := reportgenerator.CommitsPerHourReportGenerator{CommitsPerHourMap: make([]int, 24)}
         mergeCommitsPerYearReportGenerator := reportgenerator.MergeCommitsPerYearReportGenerator{MergeCommitsPerYearMap: make(map[int]int)}
 
-		r, err := git.PlainOpen(path)
+		path := "."
+        if len(args) == 1 {
+		    path = args[0]
+        }
+
+        r, err := git.PlainOpen(path)
         if errors.Is(err, git.ErrRepositoryNotExists) {
             fmt.Println("The provided path is not a git repository: " + path) // no model found for id
             os.Exit(1)
@@ -123,9 +126,6 @@ var rootCmd = &cobra.Command{
             fmt.Println("Invalid printer value. Valid values are `console` and `html`")
             os.Exit(1)
         }
-
-
-        
 	},
 }
 
@@ -133,9 +133,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&developerEmail, "dev", "_", "choose developer by email")
     rootCmd.PersistentFlags().StringVar(&fromDate, "from", "", "Filter commits from this date (format: YYYY-MM-DD)")
 	rootCmd.PersistentFlags().StringVar(&toDate, "to", "", "Filter commits up to this date (format: YYYY-MM-DD)")
-	rootCmd.PersistentFlags().StringVar(&printerOption, "printer", "", "Printer (default to console)")
-
-    rootCmd.AddCommand(serve.ServeCmd)
+	rootCmd.PersistentFlags().StringVar(&printerOption, "printer", "", "Printer (default to console) (available options are console and html")
 }
 
 func Execute() {
