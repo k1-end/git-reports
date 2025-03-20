@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/go-git/go-git/v5"
@@ -106,6 +107,10 @@ var rootCmd = &cobra.Command{
         fileTypeReportGenerator := reportgenerator.FileTypeReportGenerator{FileTypeMap: make(map[string]int)}
         fileTypeReportGenerator.Iterate(commit)
 
+
+        absolutePath, _ := filepath.Abs(path)
+        dirName := filepath.Base(absolutePath)
+
         if printerOption == "" || printerOption == "console" {
             p := reportprinter.ConsolePrinter{}
             p.RegisterReport(commitCountDateHeatMapGenerator.GetReport())
@@ -113,6 +118,7 @@ var rootCmd = &cobra.Command{
             p.RegisterReport(commitsPerHourReportGenerator.GetReport())
             p.RegisterReport(mergeCommitsPerYearReportGenerator.GetReport())
             p.RegisterReport(fileTypeReportGenerator.GetReport())
+            p.SetProjectTitle(dirName)
             p.Print()
         }else if printerOption == "html" {
             p := reportprinter.HtmlPrinter{}
@@ -121,6 +127,7 @@ var rootCmd = &cobra.Command{
             p.RegisterReport(commitsPerHourReportGenerator.GetReport())
             p.RegisterReport(mergeCommitsPerYearReportGenerator.GetReport())
             p.RegisterReport(fileTypeReportGenerator.GetReport())
+            p.SetProjectTitle(dirName)
             p.Print()
         }else {
             fmt.Println("Invalid printer value. Valid values are `console` and `html`")

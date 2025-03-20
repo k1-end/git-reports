@@ -62,6 +62,7 @@ func commitCountGuide() {
 
 type ConsolePrinter struct {
     reports []report.Report
+    projectTitle string
 }
 
 type Tday struct {
@@ -247,4 +248,12 @@ func (p *ConsolePrinter) Print() {
             p.printDateHeatMapChart(p.reports[k])
         }
     }
+}
+
+func (p *ConsolePrinter) SetProjectTitle(s string)  {
+    p.projectTitle = s
+}
+
+func (p *ConsolePrinter) GetProjectTitle()  string{
+    return p.projectTitle
 }

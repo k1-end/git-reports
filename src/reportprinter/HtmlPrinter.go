@@ -14,6 +14,7 @@ import (
 
 type HtmlPrinter struct {
     reports []report.Report
+    projectTitle string
 }
 
 func (p HtmlPrinter) printDateHeatMapChart(c report.Report) {
@@ -179,7 +180,7 @@ func (p HtmlPrinter) printLineChart(c report.Report) {
 }
 
 func (p HtmlPrinter) Print() {
-    fmt.Println(`
+    fmt.Printf(`
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -188,7 +189,7 @@ func (p HtmlPrinter) Print() {
         <meta name="description" content="">
         <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
         <meta name="generator" content="Hugo 0.84.0">
-        <title>Dashboard Template · Bootstrap v5.0</title>
+        <title>Git reports for %s</title>
 
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
@@ -196,7 +197,7 @@ func (p HtmlPrinter) Print() {
     <body>
 
         <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-            <a class="navbar-brand col-md-12 me-0 px-3 text-center" href="#">Company name</a>
+            <a class="navbar-brand col-md-12 me-0 px-3 text-center" href="#">%s</a>
         </header>
 
         <div class="container-fluid p-5">
@@ -207,7 +208,7 @@ func (p HtmlPrinter) Print() {
                     <link rel="stylesheet" href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css">
                     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
                     <div style="width: 800px;" id="cal-heatmap"></div>
-        `)
+        `, p.GetProjectTitle(), p.GetProjectTitle())
     for k := range p.reports {
         switch p.reports[k].GetReportType() {
         case "date_heatmap":
@@ -227,4 +228,12 @@ func (p HtmlPrinter) Print() {
     </body>
 </html>
         `)
+}
+
+func (p *HtmlPrinter) SetProjectTitle(s string)  {
+    p.projectTitle = s
+}
+
+func (p *HtmlPrinter) GetProjectTitle()  string{
+    return p.projectTitle
 }
