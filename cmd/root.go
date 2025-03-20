@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -59,6 +60,10 @@ var rootCmd = &cobra.Command{
         mergeCommitsPerYearReportGenerator := reportgenerator.MergeCommitsPerYearReportGenerator{MergeCommitsPerYearMap: make(map[int]int)}
 
 		r, err := git.PlainOpen(path)
+        if errors.Is(err, git.ErrRepositoryNotExists) {
+            fmt.Println("The provided path is not a git repository: " + path) // no model found for id
+            os.Exit(1)
+        }
 		checkIfError(err)
 
 		ref, err := r.Head()
