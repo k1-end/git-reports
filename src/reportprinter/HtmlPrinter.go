@@ -6,7 +6,6 @@ import (
 	"html/template"
 	"math/rand/v2"
 	"os"
-	"path/filepath"
 	"sort"
 	"time"
 
@@ -64,32 +63,7 @@ func (p HtmlPrinter) renderDateHeatMapChart(c report.Report) string {
         yearsKey = append(yearsKey, k)
     }
     sort.Ints(yearsKey)
-    tmpl, err := template.New("HeatMap").Parse(`
-        <script>
-        var data = [
-        {{range .Years}}
-            {{range .Tmonths}}
-                {{range .Tdays}}
-                    { date: '{{.Date.Format "2006-01-02"}}', value: {{.CommitCount}} },
-                {{end}}
-            {{end}}
-        {{end}}
-        ];
-
-        var cal = new CalHeatmap();
-        cal.paint({
-        data: { source: data, x: 'date', y: 'value' },
-        domain: { type: 'year'},
-        subDomain: { type: 'day', width: 13, height: 13},
-        scale: { color: { type: 'linear', domain: [0, 20], range: ['white', 'green'], interpolate: 'hsl',}, },
-        verticalOrientation: true,
-        date: { 
-            start: new Date('{{.FirstDate.Format "2006-01-02"}}'),
-        },
-        range: {{.Range}}
-        });
-        </script>
-        `)
+    tmpl, err := template.New("date-heatmap.html").ParseFiles("templates/date-heatmap.html")
     if err != nil{
         fmt.Println(err)
         panic(err)
@@ -120,44 +94,7 @@ func (p *HtmlPrinter) RegisterReport(r report.Report) {
 }
 
 func (p HtmlPrinter) renderLineChart(c report.Report) string {
-    tmpl, err := template.New("HeatMap").Parse(`
-        <div style="width: 800px;"><canvas id="{{.ElementId}}"></canvas></div>
-        <script>
-        new Chart(
-            document.getElementById("{{.ElementId}}"),
-            {
-              type: 'bar',
-              data: {
-                labels: [
-                    {{range .Labels}}
-                        {{.}},
-                    {{end}}
-                ],
-                datasets: [
-                  {
-                    label: '{{.Title}}',
-                    data: [
-                        {{range .Data}}
-                            {{.}},
-                        {{end}}
-                    ],
-                  }
-                ]
-              },
-        options: {
-          scales: {
-            x: {
-              ticks: {
-                display: true,
-                autoSkip: false
-              }
-            }
-          }
-        }
-            }
-          );
-        </script>
-        `)
+    tmpl, err := template.New("line-chart.html").ParseFiles("templates/line-chart.html")
     if err != nil{
         fmt.Println(err)
         panic(err)
@@ -187,11 +124,7 @@ func (p HtmlPrinter) renderLineChart(c report.Report) string {
 }
 
 func (p HtmlPrinter) Print() {
-    templateDir, err := filepath.Abs("templates/main.html")
-    if err != nil {
-        fmt.Println(err)
-    }
-    tmpl, err := template.New("main.html").ParseFiles(templateDir)
+    tmpl, err := template.New("main.html").ParseFiles("templates/main.html")
 
     if err != nil{
         fmt.Println(err)

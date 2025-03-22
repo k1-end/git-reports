@@ -1,0 +1,24 @@
+<script>
+var data = [
+{{range .Years}}
+    {{range .Tmonths}}
+        {{range .Tdays}}
+            { date: '{{.Date.Format "2006-01-02"}}', value: {{.CommitCount}} },
+        {{end}}
+    {{end}}
+{{end}}
+];
+
+var cal = new CalHeatmap();
+cal.paint({
+data: { source: data, x: 'date', y: 'value' },
+domain: { type: 'year'},
+subDomain: { type: 'day', width: 13, height: 13},
+scale: { color: { type: 'linear', domain: [0, 20], range: ['white', 'green'], interpolate: 'hsl',}, },
+verticalOrientation: true,
+date: { 
+    start: new Date('{{.FirstDate.Format "2006-01-02"}}'),
+},
+range: {{.Range}}
+});
+</script>
