@@ -1,6 +1,7 @@
 package reportprinter
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"math/rand/v2"
@@ -17,12 +18,11 @@ type HtmlPrinter struct {
     projectTitle string
 }
 
-func (p HtmlPrinter) printDateHeatMapChart(c report.Report) {
+func (p HtmlPrinter) renderDateHeatMapChart(c report.Report) string {
     keys := c.GetLabels()
     data := c.GetData()
     if len(data) == 0 {
-        fmt.Println("No commits where found!")
-        return
+        return ""
     }
     firstDate, _ := time.Parse("2006-1-2", keys[0])
     startDate := time.Date(firstDate.Year(), firstDate.Month(), 1, 0, 0, 0, 0, firstDate.Location())
@@ -102,19 +102,23 @@ func (p HtmlPrinter) printDateHeatMapChart(c report.Report) {
     anon.Years = years
     anon.FirstDate = firstDate
     anon.Range = endDate.Year() - firstDate.Year() + 1
-    err = tmpl.Execute(os.Stdout, anon)
+
+    var buf bytes.Buffer
+
+    err = tmpl.Execute(&buf, anon)
 
     if err != nil{
         fmt.Println(err)
         panic(err)
     }
+    return buf.String()
 }
 
 func (p *HtmlPrinter) RegisterReport(r report.Report) {
     p.reports = append(p.reports, r)
 }
 
-func (p HtmlPrinter) printLineChart(c report.Report) {
+func (p HtmlPrinter) renderLineChart(c report.Report) string {
     tmpl, err := template.New("HeatMap").Parse(`
         <div style="width: 800px;"><canvas id="{{.ElementId}}"></canvas></div>
         <script>
@@ -171,12 +175,14 @@ func (p HtmlPrinter) printLineChart(c report.Report) {
     }
     anon.Data = data
     anon.ElementId = rand.IntN(10000000)
-    err = tmpl.Execute(os.Stdout, anon)
+    var buf bytes.Buffer
+    err = tmpl.Execute(&buf, anon)
 
     if err != nil{
         fmt.Println(err)
         panic(err)
     }
+    return buf.String()
 }
 
 func (p HtmlPrinter) Print() {
@@ -208,49 +214,38 @@ func (p HtmlPrinter) Print() {
                     <link rel="stylesheet" href="https://unpkg.com/cal-heatmap/dist/cal-heatmap.css">
                     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
                     <div style="width: 800px;" id="cal-heatmap"></div>
-        `)
-
-    if err != nil{
-        fmt.Println(err)
-        panic(err)
-    }
-
-    var anon struct{
-        ProjectTitle string
-    }
-    anon.ProjectTitle = p.GetProjectTitle()
-    err = tmpl.Execute(os.Stdout, anon)
-
-    if err != nil{
-        fmt.Println(err)
-        panic(err)
-    }
-
-    for k := range p.reports {
-        switch p.reports[k].GetReportType() {
-        case "date_heatmap":
-            p.printDateHeatMapChart(p.reports[k])
-        case "line_chart":
-            p.printLineChart(p.reports[k])
-        }
-    }
-
-    tmpl, err = template.New("footer").Parse(`
+                    {{.RenderedReports}}
                 </main>
             </div>
         </div>
-
-
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     </body>
 </html>
         `)
+
     if err != nil{
         fmt.Println(err)
         panic(err)
     }
 
-    err = tmpl.Execute(os.Stdout, struct{}{})
+    var renderedReports bytes.Buffer
+    for k := range p.reports {
+        switch p.reports[k].GetReportType() {
+        case "date_heatmap":
+            renderedReports.WriteString(p.renderDateHeatMapChart(p.reports[k]))
+        case "line_chart":
+            renderedReports.WriteString(p.renderLineChart(p.reports[k]))
+        }
+        renderedReports.WriteString("\n")
+    }
+
+    var anon struct{
+        ProjectTitle string
+        RenderedReports template.HTML
+    }
+    anon.ProjectTitle = p.GetProjectTitle()
+    anon.RenderedReports = template.HTML(renderedReports.String())
+    err = tmpl.Execute(os.Stdout, anon)
 
     if err != nil{
         fmt.Println(err)
