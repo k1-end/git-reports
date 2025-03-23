@@ -140,7 +140,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&developerEmail, "dev", "d", "_", "choose developer by email")
     rootCmd.PersistentFlags().StringVarP(&fromDate, "from", "f", "", "Filter commits from this date (format: YYYY-MM-DD)")
 	rootCmd.PersistentFlags().StringVarP(&toDate, "to", "t", "", "Filter commits up to this date (format: YYYY-MM-DD)")
-	rootCmd.PersistentFlags().StringVarP(&printerOption, "printer", "p", "console", "Printer (default to console) (available options are console and html")
+	rootCmd.PersistentFlags().StringVarP(&printerOption, "printer", "p", "console", "Printer (default to console) (available options are console and html)")
 }
 
 func Execute() {
