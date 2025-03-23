@@ -31,23 +31,29 @@ func (p HtmlPrinter) renderDateHeatMapChart(c report.Report) string {
 	lastDate, _ := time.Parse("2006-1-2", keys[len(keys)-1])
 	endDate := time.Date(lastDate.Year(), lastDate.Month(), 1, 0, 0, 0, 0, lastDate.Location()).AddDate(0, 1, -1)
 
-	type dateData struct {
-		Date        time.Time
-		CommitCount int
-	}
-	yearData := make(map[int]map[time.Month]map[int]dateData)
-
+	years := make(map[int]yearData)
 	counter := 0
+
 	for startDate.Before(endDate) {
 		year := startDate.Year()
 		month := startDate.Month()
 		day := startDate.Day()
 
-		if _, exists := yearData[year]; !exists {
-			yearData[year] = make(map[time.Month]map[int]dateData)
+		if _, exists := years[year]; !exists {
+			years[year] = yearData{
+				Year: year,
+				Months: make(map[time.Month]map[int]struct {
+					Date        time.Time
+					CommitCount int
+				}),
+			}
 		}
-		if _, exists := yearData[year][month]; !exists {
-			yearData[year][month] = make(map[int]dateData)
+
+		if _, exists := years[year].Months[month]; !exists {
+			years[year].Months[month] = make(map[int]struct {
+				Date        time.Time
+				CommitCount int
+			})
 		}
 
 		commitCount := 0
@@ -56,7 +62,10 @@ func (p HtmlPrinter) renderDateHeatMapChart(c report.Report) string {
 			counter++
 		}
 
-		yearData[year][month][day] = dateData{
+		years[year].Months[month][day] = struct {
+			Date        time.Time
+			CommitCount int
+		}{
 			Date:        startDate,
 			CommitCount: commitCount,
 		}
@@ -71,11 +80,11 @@ func (p HtmlPrinter) renderDateHeatMapChart(c report.Report) string {
 	}
 
 	var anon struct {
-		YearData  map[int]map[time.Month]map[int]dateData
+		Years     map[int]yearData
 		FirstDate time.Time
 		Range     int
 	}
-	anon.YearData = yearData
+	anon.Years = years
 	anon.FirstDate = firstDate
 	anon.Range = endDate.Year() - firstDate.Year() + 1
 

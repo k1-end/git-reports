@@ -63,17 +63,9 @@ type ConsolePrinter struct {
 	BasePrinter
 }
 
-type yearData struct {
-	year   int
-	months map[time.Month]map[int]struct {
-		date        time.Time
-		commitCount int
-	}
-}
-
 func (y yearData) getFirstMonth() (time.Month, error) {
 	for i := 1; i < 13; i++ {
-		if _, ok := y.months[time.Month(i)]; ok {
+		if _, ok := y.Months[time.Month(i)]; ok {
 			return time.Month(i), nil
 		}
 	}
@@ -87,7 +79,7 @@ func (y yearData) print() {
 		BackgroundStyle: pterm.NewStyle(pterm.BgLightGreen),
 	}
 
-	newHeader.WithFullWidth().Println(y.year)
+	newHeader.WithFullWidth().Println(y.Year)
 	width, _, _ := term.GetSize(int(os.Stdout.Fd()))
 	monthW := 6
 	offset := 1 + 5
@@ -109,7 +101,7 @@ func (y yearData) print() {
 	for monthIndex < 13 {
 		fmt.Print("     ")
 		for monthIndex-int(firstMonth)+1 <= lineIndex*monthPerLine && monthIndex < 13 {
-			if _, ok := y.months[time.Month(monthIndex)]; ok {
+			if _, ok := y.Months[time.Month(monthIndex)]; ok {
 				fmt.Print("  ")
 				pterm.DefaultBasicText.Print(pterm.Green(time.Month(monthIndex).String()[0:3]))
 				pterm.DefaultBasicText.Print(pterm.Yellow(" |"))
@@ -124,14 +116,14 @@ func (y yearData) print() {
 			pterm.DefaultBasicText.Print(pterm.Yellow(": "))
 
 			for monthIndex-int(firstMonth)+1 <= lineIndex*monthPerLine && monthIndex < 13 {
-				if monthData, ok := y.months[time.Month(monthIndex)]; ok {
-					firstWeekDay := monthData[1].date.Weekday()
+				if monthData, ok := y.Months[time.Month(monthIndex)]; ok {
+					firstWeekDay := monthData[1].Date.Weekday()
 					for j := 1; j < 7; j++ {
 						dayIndex := 7*j - int(firstWeekDay) - 6 + i
 						if dayData, ok := monthData[dayIndex]; ok {
-							color := getColor(dayData.commitCount)
+							color := getColor(dayData.CommitCount)
 							char := "."
-							if dayData.commitCount > 0 {
+							if dayData.CommitCount > 0 {
 								char = "*"
 							}
 							fmt.Printf("\x1b[48;2;%sm%s\x1b[0m", color, char)
@@ -172,10 +164,14 @@ func (p ConsolePrinter) printDateHeatMapChart(c report.Report) {
 		return
 	}
 
+	// Parse the first commit date from the input data
 	firstDate, _ := time.Parse("2006-1-2", keys[0])
+	// Set startDate to beginning of the month containing the first commit
 	startDate := time.Date(firstDate.Year(), firstDate.Month(), 1, 0, 0, 0, 0, firstDate.Location())
 
+	// Parse the last commit date from the input data
 	lastDate, _ := time.Parse("2006-1-2", keys[len(keys)-1])
+	// Set endDate to end of the month containing the last commit
 	endDate := time.Date(lastDate.Year(), lastDate.Month(), 1, 0, 0, 0, 0, lastDate.Location()).AddDate(0, 1, -1)
 
 	years := make(map[int]yearData)
@@ -188,18 +184,18 @@ func (p ConsolePrinter) printDateHeatMapChart(c report.Report) {
 
 		if _, exists := years[year]; !exists {
 			years[year] = yearData{
-				year: year,
-				months: make(map[time.Month]map[int]struct {
-					date        time.Time
-					commitCount int
+				Year: year,
+				Months: make(map[time.Month]map[int]struct {
+					Date        time.Time
+					CommitCount int
 				}),
 			}
 		}
 
-		if _, exists := years[year].months[month]; !exists {
-			years[year].months[month] = make(map[int]struct {
-				date        time.Time
-				commitCount int
+		if _, exists := years[year].Months[month]; !exists {
+			years[year].Months[month] = make(map[int]struct {
+				Date        time.Time
+				CommitCount int
 			})
 		}
 
@@ -209,12 +205,12 @@ func (p ConsolePrinter) printDateHeatMapChart(c report.Report) {
 			counter++
 		}
 
-		years[year].months[month][day] = struct {
-			date        time.Time
-			commitCount int
+		years[year].Months[month][day] = struct {
+			Date        time.Time
+			CommitCount int
 		}{
-			date:        startDate,
-			commitCount: commitCount,
+			Date:        startDate,
+			CommitCount: commitCount,
 		}
 
 		startDate = startDate.AddDate(0, 0, 1)
