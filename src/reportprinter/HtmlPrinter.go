@@ -7,7 +7,6 @@ import (
 	"html/template"
 	"math/rand/v2"
 	"os"
-	"sort"
 	"time"
 
 	"github.com/k1-end/git-visualizer/src/report"
@@ -32,39 +31,39 @@ func (p HtmlPrinter) renderDateHeatMapChart(c report.Report) string {
 	lastDate, _ := time.Parse("2006-1-2", keys[len(keys)-1])
 	endDate := time.Date(lastDate.Year(), lastDate.Month(), 1, 0, 0, 0, 0, lastDate.Location()).AddDate(0, 1, -1)
 
-	years := make(map[int]Tyear)
+	type dateData struct {
+		Date        time.Time
+		CommitCount int
+	}
+	yearData := make(map[int]map[time.Month]map[int]dateData)
+
 	counter := 0
 	for startDate.Before(endDate) {
-		_, exists := years[startDate.Year()]
-		if !exists {
-			years[startDate.Year()] = Tyear{Tmonths: make(map[time.Month]Tmonth), Year: startDate.Year()}
+		year := startDate.Year()
+		month := startDate.Month()
+		day := startDate.Day()
+
+		if _, exists := yearData[year]; !exists {
+			yearData[year] = make(map[time.Month]map[int]dateData)
+		}
+		if _, exists := yearData[year][month]; !exists {
+			yearData[year][month] = make(map[int]dateData)
 		}
 
-		_, exists = years[startDate.Year()].Tmonths[startDate.Month()]
-		if !exists {
-			years[startDate.Year()].Tmonths[startDate.Month()] = Tmonth{Tdays: make(map[int]Tday), Month: startDate.Month()}
-		}
-
-		tDay, exists := years[startDate.Year()].Tmonths[startDate.Month()].Tdays[startDate.Day()]
-		if !exists {
-			years[startDate.Year()].Tmonths[startDate.Month()].Tdays[startDate.Day()] = Tday{}
-		}
-		tDay.Date = startDate
+		commitCount := 0
 		if counter < len(keys) && startDate.Format("2006-1-2") == keys[counter] {
-			tDay.CommitCount = data[counter].IntValue
-			counter += 1 // data does not contain all dates and we are iterating overall dates, so we must increment only when the date matches
-		} else {
-			tDay.CommitCount = 0
+			commitCount = data[counter].IntValue
+			counter++
 		}
-		years[startDate.Year()].Tmonths[startDate.Month()].Tdays[startDate.Day()] = tDay
+
+		yearData[year][month][day] = dateData{
+			Date:        startDate,
+			CommitCount: commitCount,
+		}
+
 		startDate = startDate.AddDate(0, 0, 1)
 	}
 
-	yearsKey := make([]int, 0, len(years))
-	for k := range years {
-		yearsKey = append(yearsKey, k)
-	}
-	sort.Ints(yearsKey)
 	tmpl, err := template.New("date-heatmap.html").ParseFS(templatesFS, "templates/date-heatmap.html")
 	if err != nil {
 		fmt.Println(err)
@@ -72,18 +71,16 @@ func (p HtmlPrinter) renderDateHeatMapChart(c report.Report) string {
 	}
 
 	var anon struct {
-		Years     map[int]Tyear
+		YearData  map[int]map[time.Month]map[int]dateData
 		FirstDate time.Time
 		Range     int
 	}
-	anon.Years = years
+	anon.YearData = yearData
 	anon.FirstDate = firstDate
 	anon.Range = endDate.Year() - firstDate.Year() + 1
 
 	var buf bytes.Buffer
-
 	err = tmpl.Execute(&buf, anon)
-
 	if err != nil {
 		fmt.Println(err)
 		panic(err)

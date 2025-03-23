@@ -1,9 +1,9 @@
 <script>
 var data = [
-{{range .Years}}
-    {{range .Tmonths}}
-        {{range .Tdays}}
-            { date: '{{.Date.Format "2006-01-02"}}', value: {{.CommitCount}} },
+{{range $year, $yearData := .YearData}}
+    {{range $month, $monthData := $yearData}}
+        {{range $day, $dayData := $monthData}}
+            { date: '{{$dayData.Date.Format "2006-01-02"}}', value: {{$dayData.CommitCount}} },
         {{end}}
     {{end}}
 {{end}}
