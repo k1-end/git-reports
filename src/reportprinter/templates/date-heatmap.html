@@ -14,11 +14,52 @@ cal.paint({
 data: { source: data, x: 'date', y: 'value' },
 domain: { type: 'year'},
 subDomain: { type: 'day', width: 13, height: 13},
-scale: { color: { type: 'linear', domain: [0, 20], range: ['white', 'green'], interpolate: 'hsl',}, },
+scale: { 
+    color: {
+        type: 'threshold',
+        range: ['#ededed', '#baebb9', '#4dd05a', '#37a446', '#14432a', ],
+        domain: [0,1, 5, 20, 30],
+        }, 
+    },
 verticalOrientation: true,
 date: { 
     start: new Date('{{.FirstDate.Format "2006-01-02"}}'),
 },
 range: {{.Range}}
-});
+},
+[
+    [
+      Tooltip,
+      {
+        text: function (date, value, dayjsDate) {
+          return (
+            (value ? value : 'No') +
+            ' contributions on ' +
+            dayjsDate.format('dddd, MMMM D, YYYY')
+          );
+        },
+      },
+    ],
+    [
+      LegendLite,
+      {
+        includeBlank: true,
+        itemSelector: '#ex-ghDay-legend',
+        radius: 2,
+        width: 11,
+        height: 11,
+        gutter: 4,
+      },
+    ],
+    [
+      CalendarLabel,
+      {
+        width: 30,
+        textAlign: 'start',
+        text: () => dayjs.weekdaysShort().map((d, i) => (i % 2 == 0 ? '' : d)),
+        padding: [25, 0, 0, 0],
+      },
+    ],
+  ]
+);
 </script>
