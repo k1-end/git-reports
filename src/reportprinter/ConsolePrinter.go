@@ -51,10 +51,9 @@ func commitCountGuide() {
 	fmt.Println()
 	commitCount := 0
 	pterm.DefaultBasicText.Print(pterm.Blue("commits count guide:"))
-	for i := 0; i < len(commitCountRange); i++ {
+	for i, char := range commitCountRange {
 		commitCount = i * 5
 		color := getColor(commitCount)
-		char := commitCountRange[i]
 		pterm.DefaultBasicText.Printf(" \x1b[48;2;%sm%s\x1b[0m ", color, pterm.Red(char))
 	}
 	fmt.Println()
