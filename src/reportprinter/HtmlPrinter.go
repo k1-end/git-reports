@@ -17,8 +17,7 @@ import (
 var templatesFS embed.FS
 
 type HtmlPrinter struct {
-	reports      []report.Report
-	projectTitle string
+	BasePrinter
 }
 
 func (p HtmlPrinter) renderDateHeatMapChart(c report.Report) string {
@@ -92,10 +91,6 @@ func (p HtmlPrinter) renderDateHeatMapChart(c report.Report) string {
 	return buf.String()
 }
 
-func (p *HtmlPrinter) RegisterReport(r report.Report) {
-	p.reports = append(p.reports, r)
-}
-
 func (p HtmlPrinter) renderLineChart(c report.Report) string {
 	tmpl, err := template.New("line-chart.html").ParseFS(templatesFS, "templates/line-chart.html")
 	if err != nil {
@@ -157,12 +152,4 @@ func (p HtmlPrinter) Print() {
 		fmt.Println(err)
 		panic(err)
 	}
-}
-
-func (p *HtmlPrinter) SetProjectTitle(s string) {
-	p.projectTitle = s
-}
-
-func (p *HtmlPrinter) GetProjectTitle() string {
-	return p.projectTitle
 }
