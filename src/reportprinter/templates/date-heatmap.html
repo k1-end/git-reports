@@ -51,15 +51,6 @@ range: {{.Range}}
         gutter: 4,
       },
     ],
-    [
-      CalendarLabel,
-      {
-        width: 30,
-        textAlign: 'start',
-        text: () => dayjs.weekdaysShort().map((d, i) => (i % 2 == 0 ? '' : d)),
-        padding: [25, 0, 0, 0],
-      },
-    ],
   ]
 );
 </script>
