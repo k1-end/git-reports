@@ -97,8 +97,8 @@ func (p HtmlPrinter) renderDateHeatMapChart(c report.Report) string {
 	return buf.String()
 }
 
-func (p HtmlPrinter) renderLineChart(c report.Report) string {
-	tmpl, err := template.New("line-chart.html").ParseFS(templatesFS, "templates/line-chart.html")
+func (p HtmlPrinter) renderBartChart(c report.Report) string {
+	tmpl, err := template.New("bar-chart.html").ParseFS(templatesFS, "templates/bar-chart.html")
 	if err != nil {
 		fmt.Println(err)
 		panic(err)
@@ -140,8 +140,8 @@ func (p HtmlPrinter) Print() {
 		switch p.reports[k].GetReportType() {
 		case "date_heatmap":
 			renderedReports.WriteString(p.renderDateHeatMapChart(p.reports[k]))
-		case "line_chart":
-			renderedReports.WriteString(p.renderLineChart(p.reports[k]))
+		case "bar_chart":
+			renderedReports.WriteString(p.renderBartChart(p.reports[k]))
 		}
 		renderedReports.WriteString("\n")
 	}

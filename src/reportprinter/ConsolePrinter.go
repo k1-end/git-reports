@@ -141,7 +141,7 @@ func (y yearData) print() {
 	}
 }
 
-func (p ConsolePrinter) printLineChart(c report.Report) {
+func (p ConsolePrinter) printBarChart(c report.Report) {
 	var barData []pterm.Bar
 	var bar pterm.Bar
 	labels := c.GetLabels()
@@ -231,8 +231,8 @@ func (p ConsolePrinter) printDateHeatMapChart(c report.Report) {
 func (p *ConsolePrinter) Print() {
 	for k := range p.reports {
 		switch p.reports[k].GetReportType() {
-		case "line_chart":
-			p.printLineChart(p.reports[k])
+		case "bar_chart":
+			p.printBarChart(p.reports[k])
 		case "date_heatmap":
 			p.printDateHeatMapChart(p.reports[k])
 		}

@@ -39,6 +39,6 @@ func (rg MergeCommitsPerYearReportGenerator) GetReport() report.Report {
     r.SetTitle("Merge Commits per year")
     r.SetLabels(labels)
     r.SetData(data)
-    r.SetReportType("line_chart")
+    r.SetReportType("bar_chart")
     return r
 }
