@@ -99,7 +99,9 @@ var rootCmd = &cobra.Command{
 		})
 
 		headRef, err := r.Head()
+		checkIfError(err)
 		commit, err := r.CommitObject(headRef.Hash())
+		checkIfError(err)
 
 		fileTypeReportGenerator := reportgenerator.FileTypeReportGenerator{FileTypeMap: make(map[string]int)}
 		fileTypeReportGenerator.Iterate(commit)
