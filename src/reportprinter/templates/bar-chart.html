@@ -1,7 +1,7 @@
-<div style="width: 800px;"><canvas id="{{.ElementId}}"></canvas></div>
+<div style="width: 800px;"><canvas id="elem-{{.ElementId}}"></canvas></div>
 <script>
 new Chart(
-    document.getElementById("{{.ElementId}}"),
+    document.getElementById("elem-{{.ElementId}}"),
     {
       type: 'bar',
       data: {

@@ -5,7 +5,6 @@ import (
 	"embed"
 	"fmt"
 	"html/template"
-	"math/rand/v2"
 	"os"
 	"strconv"
 	"time"
@@ -20,10 +19,12 @@ type HtmlPrinter struct {
 	BasePrinter
 }
 
-func (p HtmlPrinter) renderTable(r report.Report) string {
+func (p HtmlPrinter) renderTable(r report.Report, elementId int) string {
 	var anon struct {
         Rows map[string]string
+        ElementId int
 	}
+    anon.ElementId = elementId
     anon.Rows = make(map[string]string)
     labels := r.GetLabels()
     for index, data := range r.GetData() {
@@ -53,7 +54,7 @@ func (p HtmlPrinter) renderTable(r report.Report) string {
 	return buf.String()
 }
 
-func (p HtmlPrinter) renderDateHeatMapChart(c report.Report) string {
+func (p HtmlPrinter) renderDateHeatMapChart(c report.Report, elementId int) string {
 	keys := c.GetLabels()
 	data := c.GetData()
 	if len(data) == 0 {
@@ -117,10 +118,12 @@ func (p HtmlPrinter) renderDateHeatMapChart(c report.Report) string {
 		Years     map[int]yearData
 		FirstDate time.Time
 		Range     int
+        ElementId int
 	}
 	anon.Years = years
 	anon.FirstDate = firstDate
 	anon.Range = endDate.Year() - firstDate.Year() + 1
+    anon.ElementId = elementId
 
 	var buf bytes.Buffer
 	err = tmpl.Execute(&buf, anon)
@@ -131,7 +134,7 @@ func (p HtmlPrinter) renderDateHeatMapChart(c report.Report) string {
 	return buf.String()
 }
 
-func (p HtmlPrinter) renderBartChart(c report.Report) string {
+func (p HtmlPrinter) renderBartChart(c report.Report, elmentId int) string {
 	tmpl, err := template.New("bar-chart.html").ParseFS(templatesFS, "templates/bar-chart.html")
 	if err != nil {
 		fmt.Println(err)
@@ -150,7 +153,7 @@ func (p HtmlPrinter) renderBartChart(c report.Report) string {
 		data = append(data, c.GetData()[k].IntValue)
 	}
 	anon.Data = data
-	anon.ElementId = rand.IntN(10000000)
+	anon.ElementId = elmentId
 	var buf bytes.Buffer
 	err = tmpl.Execute(&buf, anon)
 
@@ -173,11 +176,11 @@ func (p HtmlPrinter) Print() {
 	for k := range p.reports {
 		switch p.reports[k].GetReportType() {
 		case "date_heatmap":
-			renderedReports.WriteString(p.renderDateHeatMapChart(p.reports[k]))
+			renderedReports.WriteString(p.renderDateHeatMapChart(p.reports[k], k))
 		case "bar_chart":
-			renderedReports.WriteString(p.renderBartChart(p.reports[k]))
+			renderedReports.WriteString(p.renderBartChart(p.reports[k], k))
 		case "table":
-			renderedReports.WriteString(p.renderTable(p.reports[k]))
+			renderedReports.WriteString(p.renderTable(p.reports[k], k))
 		}
 		renderedReports.WriteString("\n")
 	}
