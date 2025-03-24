@@ -11,7 +11,7 @@ type CommitsPerDevReportGenerator struct {
     CommitsPerDevMap map[string]int
 }
 
-func (r CommitsPerDevReportGenerator) IterationStep(c *object.Commit)  {
+func (r CommitsPerDevReportGenerator) LogIterationStep(c *object.Commit)  {
     _, exists := r.CommitsPerDevMap[c.Author.Name]
     if !exists {
         r.CommitsPerDevMap[c.Author.Name] = 1

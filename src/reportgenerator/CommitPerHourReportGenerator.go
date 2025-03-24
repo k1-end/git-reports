@@ -11,7 +11,7 @@ type CommitsPerHourReportGenerator struct {
     CommitsPerHourMap []int
 }
 
-func (r CommitsPerHourReportGenerator) IterationStep(c *object.Commit)  {
+func (r CommitsPerHourReportGenerator) LogIterationStep(c *object.Commit)  {
 	r.CommitsPerHourMap[c.Author.When.Local().Hour()]++
 }
 

@@ -12,7 +12,7 @@ type MergeCommitsPerYearReportGenerator struct {
     MergeCommitsPerYearMap map[int]int
 }
 
-func (r MergeCommitsPerYearReportGenerator) IterationStep(c *object.Commit)  {
+func (r MergeCommitsPerYearReportGenerator) LogIterationStep(c *object.Commit)  {
     year, _, _ := c.Author.When.Local().Date()
     if c.NumParents() > 1 {
         if _, exists := r.MergeCommitsPerYearMap[year]; !exists {
