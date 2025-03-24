@@ -18,6 +18,7 @@ var developerEmail string
 var fromDate string
 var toDate string
 var printerOption string
+var Version string
 
 var rootCmd = &cobra.Command{
 	Use:   "git-reports [path]",
@@ -133,10 +134,24 @@ func getPrinter(printerOption string) reportprinter.Printer {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&developerEmail, "dev", "d", "_", "choose developer by email")
-	rootCmd.PersistentFlags().StringVarP(&fromDate, "from", "f", "", "Filter commits from this date (format: YYYY-MM-DD)")
-	rootCmd.PersistentFlags().StringVarP(&toDate, "to", "t", "", "Filter commits up to this date (format: YYYY-MM-DD)")
-	rootCmd.PersistentFlags().StringVarP(&printerOption, "printer", "p", "console", "Printer (default to console) (available options are console and html)")
+    rootCmd.PersistentFlags().StringVarP(&developerEmail, "dev", "d", "_", "choose developer by email")
+    rootCmd.PersistentFlags().StringVarP(&fromDate, "from", "f", "", "Filter commits from this date (format: YYYY-MM-DD)")
+    rootCmd.PersistentFlags().StringVarP(&toDate, "to", "t", "", "Filter commits up to this date (format: YYYY-MM-DD)")
+    rootCmd.PersistentFlags().StringVarP(&printerOption, "printer", "p", "console", "Printer (default to console) (available options are console and html)")
+
+    rootCmd.Flags().BoolP("version", "v", false, "Print the version") // Subcommands do not automatically inherit this flag
+    rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+        versionFlag, err := cmd.Flags().GetBool("version")
+        if err != nil {
+            return err
+        }
+
+        if versionFlag {
+            fmt.Println("Version:", Version)
+            os.Exit(0)
+        }
+        return nil
+    }
 }
 
 func Execute() {

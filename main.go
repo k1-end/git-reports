@@ -6,6 +6,9 @@ import (
 
 // nodemon --exec go run main.go . --signal SIGTERM
 
+var version string
+
 func main() {
+    cmd.Version = version
 	cmd.Execute()
 }
