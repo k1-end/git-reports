@@ -56,6 +56,8 @@ var rootCmd = &cobra.Command{
 		commitsPerDevReportGenerator := reportgenerator.CommitsPerDevReportGenerator{CommitsPerDevMap: make(map[string]int)}
 		commitsPerHourReportGenerator := reportgenerator.CommitsPerHourReportGenerator{CommitsPerHourMap: make([]int, 24)}
 		mergeCommitsPerYearReportGenerator := reportgenerator.MergeCommitsPerYearReportGenerator{MergeCommitsPerYearMap: make(map[int]int)}
+		fileTypeReportGenerator := reportgenerator.FileTypeReportGenerator{FileTypeMap: make(map[string]int)}
+		generalInfoReportGenerator := reportgenerator.GeneralInfoReportGenerator{}
 
 		path := "."
 		if len(args) == 1 {
@@ -91,10 +93,11 @@ var rootCmd = &cobra.Command{
 				return nil
 			}
 
-			commitCountDateHeatMapGenerator.IterationStep(c)
-			commitsPerDevReportGenerator.IterationStep(c)
-			commitsPerHourReportGenerator.IterationStep(c)
-			mergeCommitsPerYearReportGenerator.IterationStep(c)
+			commitCountDateHeatMapGenerator.LogIterationStep(c)
+			commitsPerDevReportGenerator.LogIterationStep(c)
+			commitsPerHourReportGenerator.LogIterationStep(c)
+			mergeCommitsPerYearReportGenerator.LogIterationStep(c)
+            generalInfoReportGenerator.LogIterationStep(c)
 
 			return nil
 		})
@@ -104,13 +107,18 @@ var rootCmd = &cobra.Command{
 		commit, err := r.CommitObject(headRef.Hash())
 		checkIfError(err)
 
-		fileTypeReportGenerator := reportgenerator.FileTypeReportGenerator{FileTypeMap: make(map[string]int)}
-		fileTypeReportGenerator.Iterate(commit)
+        fIter, _ := commit.Files()
+        fIter.ForEach(func(f *object.File) error {
+            fileTypeReportGenerator.FileIterationStep(f)
+            generalInfoReportGenerator.FileIterationStep(f)
+            return nil
+        })
 
 		absolutePath, _ := filepath.Abs(path)
 		dirName := filepath.Base(absolutePath)
 
 		p := getPrinter(printerOption)
+		p.RegisterReport(generalInfoReportGenerator.GetReport())
 		p.RegisterReport(commitCountDateHeatMapGenerator.GetReport())
 		p.RegisterReport(commitsPerDevReportGenerator.GetReport())
 		p.RegisterReport(commitsPerHourReportGenerator.GetReport())

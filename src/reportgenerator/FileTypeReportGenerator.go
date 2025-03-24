@@ -12,17 +12,13 @@ type FileTypeReportGenerator struct {
     FileTypeMap  map[string]int
 }
 
-func (r FileTypeReportGenerator) Iterate(c *object.Commit)  {
-    fIter, _ := c.Files()
-    fIter.ForEach(func(f *object.File) error {
-        mtype := filepath.Ext(f.Name)
-        if _, exists := r.FileTypeMap[mtype]; !exists {
-            r.FileTypeMap[mtype] = int(f.Size)
-        } else {
-            r.FileTypeMap[mtype] = r.FileTypeMap[mtype] + int(f.Size)
-        }
-        return nil
-    })
+func (r FileTypeReportGenerator) FileIterationStep(f *object.File)  {
+    mtype := filepath.Ext(f.Name)
+    if _, exists := r.FileTypeMap[mtype]; !exists {
+        r.FileTypeMap[mtype] = int(f.Size)
+    } else {
+        r.FileTypeMap[mtype] = r.FileTypeMap[mtype] + int(f.Size)
+    }
 }
 
 func (rg FileTypeReportGenerator) GetReport() report.Report {
