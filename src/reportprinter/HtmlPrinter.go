@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"math/rand/v2"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/k1-end/git-visualizer/src/report"
@@ -17,6 +18,39 @@ var templatesFS embed.FS
 
 type HtmlPrinter struct {
 	BasePrinter
+}
+
+func (p HtmlPrinter) renderTable(r report.Report) string {
+	var anon struct {
+        Rows map[string]string
+	}
+    anon.Rows = make(map[string]string)
+    labels := r.GetLabels()
+    for index, data := range r.GetData() {
+        label := labels[index]
+        var value string
+        switch data.IsInt {
+        case true:
+            value = strconv.Itoa(data.IntValue)
+        case false:
+            value = data.StringValue
+        }
+        anon.Rows[label] = value
+    }
+
+	tmpl, err := template.New("table.html").ParseFS(templatesFS, "templates/table.html")
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
+
+	var buf bytes.Buffer
+	err = tmpl.Execute(&buf, anon)
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
+	return buf.String()
 }
 
 func (p HtmlPrinter) renderDateHeatMapChart(c report.Report) string {
@@ -142,6 +176,8 @@ func (p HtmlPrinter) Print() {
 			renderedReports.WriteString(p.renderDateHeatMapChart(p.reports[k]))
 		case "bar_chart":
 			renderedReports.WriteString(p.renderBartChart(p.reports[k]))
+		case "table":
+			renderedReports.WriteString(p.renderTable(p.reports[k]))
 		}
 		renderedReports.WriteString("\n")
 	}
