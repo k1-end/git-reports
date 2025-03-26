@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/k1-end/git-visualizer/src/report"
@@ -156,6 +157,25 @@ func (p ConsolePrinter) printBarChart(c report.Report) {
 	_ = pterm.DefaultBarChart.WithBars(barData).WithHorizontal().WithWidth(90).WithShowValue().Render()
 }
 
+func (p ConsolePrinter) printTable(r report.Report) {
+    tableData := pterm.TableData{}
+    tableData = append(tableData, []string{"", ""})
+    labels := r.GetLabels()
+    for index, data := range r.GetData() {
+        label := labels[index]
+        var value string
+        switch data.IsInt {
+        case true:
+            value = strconv.Itoa(data.IntValue)
+        case false:
+            value = data.StringValue
+        }
+        tableData = append(tableData, []string{label, value})
+    }
+    pterm.DefaultHeader.WithBackgroundStyle(pterm.NewStyle(pterm.BgGreen)).Println(r.GetTitle())
+    pterm.DefaultTable.WithHasHeader().WithBoxed().WithData(tableData).Render()
+}
+
 func (p ConsolePrinter) printDateHeatMapChart(c report.Report) {
 	keys := c.GetLabels()
 	data := c.GetData()
@@ -235,6 +255,8 @@ func (p *ConsolePrinter) Print(s *os.File) {
 			p.printBarChart(p.reports[k])
 		case "date_heatmap":
 			p.printDateHeatMapChart(p.reports[k])
+        case "table":
+            p.printTable(p.reports[k])
 		}
 	}
 }
