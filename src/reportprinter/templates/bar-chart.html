@@ -18,6 +18,7 @@ new Chart(
                     {{.}},
                 {{end}}
             ],
+            backgroundColor:  'rgb(55, 164, 70)',
           }
         ]
       },
@@ -27,9 +28,26 @@ options: {
       ticks: {
         display: true,
         autoSkip: false
+      },
+      grid: {
+        display: false
+      }
+    },
+    y: {
+      grid: {
+        display: false
       }
     }
-  }
+  },
+  plugins: {
+      title: {
+        display: true,
+        text: '{{.Title}}',
+      },
+      legend: {
+        display: false
+      }
+    }
 }
     }
   );
