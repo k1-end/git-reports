@@ -1,9 +1,10 @@
 package reportgenerator
 
 import (
-
 	"github.com/go-git/go-git/v5/plumbing/object"
-    "github.com/k1-end/git-visualizer/src/report"
+	"github.com/k1-end/git-visualizer/src/report"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 )
 
 type GeneralInfoReportGenerator struct {
@@ -35,11 +36,12 @@ func (rg GeneralInfoReportGenerator) GetReport() report.Report {
     keys := []string{"Number of contributors", "Number of commits", "Project size", "Number of files"}
 
 
+    p := message.NewPrinter(language.English)
     var data []report.Data
-    data = append(data, report.Data{IsInt: true, IntValue: rg.ContributorsNo})
-    data = append(data, report.Data{IsInt: true, IntValue: rg.CommitsNo})
-    data = append(data, report.Data{IsInt: true, IntValue: int(rg.ProjectSize)})
-    data = append(data, report.Data{IsInt: true, IntValue: rg.FilesNo})
+    data = append(data, report.Data{IsInt: false, StringValue: p.Sprintf("%d", rg.ContributorsNo)})
+    data = append(data, report.Data{IsInt: false, StringValue: p.Sprintf("%d", rg.CommitsNo)})
+    data = append(data, report.Data{IsInt: false, StringValue: p.Sprintf("%d", rg.ProjectSize / 1000) + " KB"})
+    data = append(data, report.Data{IsInt: false, StringValue: p.Sprintf("%d", rg.FilesNo)})
 
     r := report.Report{}
     r.SetLabels(keys)

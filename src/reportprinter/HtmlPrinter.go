@@ -23,9 +23,11 @@ func (p HtmlPrinter) renderTable(r report.Report, elementId int) string {
 	var anon struct {
         Rows map[string]string
         ElementId int
+        Title string
 	}
     anon.ElementId = elementId
     anon.Rows = make(map[string]string)
+    anon.Title = r.GetTitle()
     labels := r.GetLabels()
     for index, data := range r.GetData() {
         label := labels[index]

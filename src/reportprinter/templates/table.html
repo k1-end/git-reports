@@ -1,9 +1,12 @@
+<h3 style="width: 800px;" class="text-center">{{.Title}}</h3>
 <table style="width: 800px;" id="elem-{{.ElementId}}" class="table">
   <thead>
+    <!--
     <tr>
       <th>Property</th>
       <th>Value</th>
     </tr>
+    -->
   </thead>
   <tbody>
     {{range $key, $value := .Rows}}
