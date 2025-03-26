@@ -1,10 +1,14 @@
 package reportprinter
 
-import "github.com/k1-end/git-visualizer/src/report"
+import (
+	"os"
+
+	"github.com/k1-end/git-visualizer/src/report"
+)
 
 type Printer interface {
 	RegisterReport(r report.Report)
-	Print()
+	Print(s *os.File)
 	SetProjectTitle(s string)
 }
 

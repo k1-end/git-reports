@@ -19,6 +19,7 @@ var fromDate string
 var toDate string
 var path string
 var printerOption string
+var outputPath string
 var Version string
 
 var rootCmd = &cobra.Command{
@@ -52,6 +53,17 @@ var rootCmd = &cobra.Command{
 			fmt.Println("'from' date must be before 'to' date.")
 			os.Exit(1)
 		}
+
+        if outputPath != ""  {
+            if printerOption == "console" {
+                fmt.Println("Console printer does not support output path")
+                os.Exit(1)
+            }
+            if !isValidFilePath(outputPath){
+                fmt.Println("The given output is not a valid file path or is not writable")
+                os.Exit(1)
+            }
+        }
 
 		commitCountDateHeatMapGenerator := reportgenerator.CommitCountDateHeatMapGenerator{CommitsMap: make(map[string]int)}
 		commitsPerDevReportGenerator := reportgenerator.CommitsPerDevReportGenerator{CommitsPerDevMap: make(map[string]int)}
@@ -122,7 +134,18 @@ var rootCmd = &cobra.Command{
 		p.RegisterReport(mergeCommitsPerYearReportGenerator.GetReport())
 		p.RegisterReport(fileTypeReportGenerator.GetReport())
 		p.SetProjectTitle(dirName)
-		p.Print()
+        if outputPath != "" {
+            destination, err := os.Create(outputPath)
+            if err != nil {
+                fmt.Println("os.Create:", err)
+                return
+            }
+            defer destination.Close()
+            p.Print(destination)
+        }else{
+            p.Print(os.Stdout)
+
+        }
 	},
 }
 
@@ -144,6 +167,7 @@ func init() {
     rootCmd.PersistentFlags().StringVarP(&fromDate, "from", "f", "", "Filter commits from this date (format: YYYY-MM-DD)")
     rootCmd.PersistentFlags().StringVarP(&toDate, "to", "t", "", "Filter commits up to this date (format: YYYY-MM-DD)")
     rootCmd.PersistentFlags().StringVar(&printerOption, "printer", "console", "Printer (default to console) (available options are console and html)")
+    rootCmd.PersistentFlags().StringVar(&outputPath, "output", "", "Output path for html report")
 
     rootCmd.Flags().BoolP("version", "v", false, "Print the version") // Subcommands do not automatically inherit this flag
     rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
@@ -166,4 +190,55 @@ func Execute() {
 		checkIfError(err)
 		os.Exit(1)
 	}
+}
+
+// isValidFilePath checks if the given path is valid for creating a file.
+// It checks if the parent directory exists and is writable.
+func isValidFilePath(filePath string) bool {
+        // Expand tilde
+        expandedPath, err := expandTilde(filePath)
+        if err != nil {
+                return false
+        }
+
+        // Get the directory part of the path.
+        dir := filepath.Dir(expandedPath)
+
+        // Check if the directory exists.
+        fileInfo, err := os.Stat(dir)
+        if os.IsNotExist(err) {
+                return false // Directory does not exist
+        }
+
+        if err != nil {
+                return false // Other error during Stat
+        }
+
+        // Check if it's a directory.
+        if !fileInfo.IsDir() {
+                return false // Parent is not a directory
+        }
+
+        // Check write permissions for the directory.
+        testFile := filepath.Join(dir, ".testwrite")
+        err = os.WriteFile(testFile, []byte("test"), 0600)
+        if err != nil {
+                return false // Write permission denied
+        }
+
+        os.Remove(testFile)
+
+        return true
+}
+
+// expandTilde expands a tilde (~) in a file path to the user's home directory.
+func expandTilde(path string) (string, error) {
+        if len(path) > 0 && path[0] == '~' {
+                homeDir, err := os.UserHomeDir()
+                if err != nil {
+                        return "", err
+                }
+                return filepath.Join(homeDir, path[1:]), nil
+        }
+        return path, nil
 }

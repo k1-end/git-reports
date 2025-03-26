@@ -164,7 +164,7 @@ func (p HtmlPrinter) renderBartChart(c report.Report, elmentId int) string {
 	return buf.String()
 }
 
-func (p HtmlPrinter) Print() {
+func (p HtmlPrinter) Print(s *os.File) {
 	tmpl, err := template.New("main.html").ParseFS(templatesFS, "templates/main.html")
 
 	if err != nil {
@@ -191,7 +191,7 @@ func (p HtmlPrinter) Print() {
 	}
 	anon.ProjectTitle = p.GetProjectTitle()
 	anon.RenderedReports = template.HTML(renderedReports.String())
-	err = tmpl.Execute(os.Stdout, anon)
+	err = tmpl.Execute(s, anon)
 
 	if err != nil {
 		fmt.Println(err)

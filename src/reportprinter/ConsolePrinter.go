@@ -228,7 +228,7 @@ func (p ConsolePrinter) printDateHeatMapChart(c report.Report) {
 	commitCountGuide()
 }
 
-func (p *ConsolePrinter) Print() {
+func (p *ConsolePrinter) Print(s *os.File) {
 	for k := range p.reports {
 		switch p.reports[k].GetReportType() {
 		case "bar_chart":
