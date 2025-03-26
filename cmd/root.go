@@ -17,14 +17,15 @@ import (
 var developerEmail string
 var fromDate string
 var toDate string
+var path string
 var printerOption string
 var Version string
 
 var rootCmd = &cobra.Command{
-	Use:   "git-reports [path]",
+	Use:   "git-reports [options]",
 	Short: "Visualize git reports",
 	Long:  "Visualize git repository at path (default to current directory)",
-	Args:  cobra.RangeArgs(0, 1),
+	Args:  cobra.ExactArgs(0),
 
 	Run: func(cmd *cobra.Command, args []string) {
 
@@ -59,10 +60,6 @@ var rootCmd = &cobra.Command{
 		fileTypeReportGenerator := reportgenerator.FileTypeReportGenerator{FileTypeMap: make(map[string]int)}
 		generalInfoReportGenerator := reportgenerator.GeneralInfoReportGenerator{}
 
-		path := "."
-		if len(args) == 1 {
-			path = args[0]
-		}
 
 		r, err := git.PlainOpen(path)
 		if errors.Is(err, git.ErrRepositoryNotExists) {
@@ -142,10 +139,11 @@ func getPrinter(printerOption string) reportprinter.Printer {
 }
 
 func init() {
+    rootCmd.PersistentFlags().StringVarP(&path, "path", "p", ".", "Repository path (default to current directory)")
     rootCmd.PersistentFlags().StringVarP(&developerEmail, "dev", "d", "_", "choose developer by email")
     rootCmd.PersistentFlags().StringVarP(&fromDate, "from", "f", "", "Filter commits from this date (format: YYYY-MM-DD)")
     rootCmd.PersistentFlags().StringVarP(&toDate, "to", "t", "", "Filter commits up to this date (format: YYYY-MM-DD)")
-    rootCmd.PersistentFlags().StringVarP(&printerOption, "printer", "p", "console", "Printer (default to console) (available options are console and html)")
+    rootCmd.PersistentFlags().StringVar(&printerOption, "printer", "console", "Printer (default to console) (available options are console and html)")
 
     rootCmd.Flags().BoolP("version", "v", false, "Print the version") // Subcommands do not automatically inherit this flag
     rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
