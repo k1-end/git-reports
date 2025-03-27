@@ -2,3 +2,4 @@ main
 main.exe
 .idea
 test*.html
+.mailmap
