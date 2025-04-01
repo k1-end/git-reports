@@ -45,7 +45,7 @@ jobs:
       - name: Build Go Application
         run: |
           echo "Building version ${{ env.VERSION }}..."
-          go build -v -ldflags="-s -w -X 'main.version=${{ github.ref_name }}'" -o my-app-binary ./git-reports
+          go build -v -ldflags="-s -w -X 'main.version=${{ github.ref_name }}'" .
           # -v: verbose output
           # -ldflags="-s -w": Strips debug symbols and DWARF information to reduce binary size (optional)
           # -o my-app-binary: Output file name
