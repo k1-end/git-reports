@@ -59,10 +59,6 @@ var rootCmd = &cobra.Command{
 		}
 
         if outputPath != ""  {
-            if printerOption == "console" {
-                fmt.Println("Console printer does not support output path")
-                os.Exit(1)
-            }
             if !isValidFilePath(outputPath){
                 fmt.Println("The given output is not a valid file path or is not writable")
                 os.Exit(1)
@@ -188,7 +184,7 @@ func init() {
     rootCmd.PersistentFlags().StringVarP(&fromDate, "from", "f", "", "Filter commits from this date (format: YYYY-MM-DD)")
     rootCmd.PersistentFlags().StringVarP(&toDate, "to", "t", "", "Filter commits up to this date (format: YYYY-MM-DD)")
     rootCmd.PersistentFlags().StringVar(&printerOption, "printer", "console", "Printer (default to console) (available options are console and html)")
-    rootCmd.PersistentFlags().StringVar(&outputPath, "output", "", "Output path for html report")
+    rootCmd.PersistentFlags().StringVar(&outputPath, "output", "", "Output path for the report")
 
     rootCmd.Flags().BoolP("version", "v", false, "Print the version") // Subcommands do not automatically inherit this flag
     rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {

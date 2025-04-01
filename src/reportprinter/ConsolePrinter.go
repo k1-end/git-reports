@@ -48,7 +48,6 @@ func getColor(commitCount int) string {
 }
 
 func commitCountGuide() {
-	fmt.Println()
 	commitCount := 0
 	pterm.DefaultBasicText.Print(pterm.Blue("commits count guide:"))
 	for i, char := range commitCountRange {
@@ -56,7 +55,6 @@ func commitCountGuide() {
 		color := getColor(commitCount)
 		pterm.DefaultBasicText.Printf(" \x1b[48;2;%sm%s\x1b[0m ", color, pterm.Red(char))
 	}
-	fmt.Println()
 }
 
 type ConsolePrinter struct {
@@ -72,14 +70,9 @@ func (y yearData) getFirstMonth() (time.Month, error) {
 	return time.Month(0), errors.New("empty name")
 }
 
-func (y yearData) print() {
-	fmt.Println()
-	newHeader := pterm.HeaderPrinter{
-		TextStyle:       pterm.NewStyle(pterm.FgBlack),
-		BackgroundStyle: pterm.NewStyle(pterm.BgLightGreen),
-	}
-
-	newHeader.WithFullWidth().Println(y.Year)
+func (y yearData) print(s *os.File) {
+    s.Write([]byte("\n"))
+	pterm.DefaultHeader.WithBackgroundStyle(pterm.NewStyle(pterm.BgLightGreen)).WithTextStyle(pterm.NewStyle(pterm.FgBlack)).WithFullWidth().Println(y.Year)
 	width := pterm.GetTerminalWidth()
 	monthW := 6
 	offset := 1 + 5
@@ -99,16 +92,16 @@ func (y yearData) print() {
 	lineIndex := 1
 
 	for monthIndex < 13 {
-		fmt.Print("     ")
+        s.Write([]byte("     "))
 		for monthIndex-int(firstMonth)+1 <= lineIndex*monthPerLine && monthIndex < 13 {
 			if _, ok := y.Months[time.Month(monthIndex)]; ok {
-				fmt.Print("  ")
+                s.Write([]byte("  "))
 				pterm.DefaultBasicText.Print(pterm.Green(time.Month(monthIndex).String()[0:3]))
 				pterm.DefaultBasicText.Print(pterm.Yellow(" |"))
 			}
 			monthIndex++
 		}
-		fmt.Println()
+        s.Write([]byte("\n"))
 
 		for i := 0; i < 7; i++ {
 			monthIndex = monthPerLine*(lineIndex-1) + 1
@@ -126,16 +119,17 @@ func (y yearData) print() {
 							if dayData.CommitCount > 0 {
 								char = "*"
 							}
-							fmt.Printf("\x1b[48;2;%sm%s\x1b[0m", color, char)
+							
+                            s.Write([]byte(fmt.Sprintf("\x1b[48;2;%sm%s\x1b[0m", color, char)))
 						} else {
-							fmt.Print(" ")
+                            s.Write([]byte(" "))
 						}
 					}
 					pterm.DefaultBasicText.Print(pterm.Yellow("|"))
 				}
 				monthIndex++
 			}
-			fmt.Println()
+            s.Write([]byte("\n"))
 		}
 		lineIndex++
 	}
@@ -175,11 +169,11 @@ func (p ConsolePrinter) printTable(r report.Report) {
     pterm.DefaultTable.WithHasHeader().WithBoxed().WithData(tableData).Render()
 }
 
-func (p ConsolePrinter) printDateHeatMapChart(c report.Report) {
+func (p ConsolePrinter) printDateHeatMapChart(c report.Report, s *os.File) {
 	keys := c.GetLabels()
 	data := c.GetData()
 	if len(data) == 0 {
-		fmt.Println("No commits where found!")
+        s.Write([]byte("No commits where found!"))
 		return
 	}
 
@@ -242,21 +236,28 @@ func (p ConsolePrinter) printDateHeatMapChart(c report.Report) {
 	sort.Ints(yearsKey)
 
 	for _, k := range yearsKey {
-		years[k].print()
+		years[k].print(s)
 	}
+    s.Write([]byte("\n"))
 	commitCountGuide()
+    s.Write([]byte("\n"))
 }
 
 func (p *ConsolePrinter) Print(s *os.File) {
     pterm.FallbackTerminalWidth = 100
+    pterm.DefaultBarChart.Writer = s
+    pterm.DefaultHeader.Writer = s
+    pterm.DefaultTable.Writer = s
+    pterm.DefaultBasicText.Writer = s
 	for k := range p.reports {
 		switch p.reports[k].GetReportType() {
 		case "bar_chart":
 			p.printBarChart(p.reports[k])
 		case "date_heatmap":
-			p.printDateHeatMapChart(p.reports[k])
+			p.printDateHeatMapChart(p.reports[k], s)
         case "table":
             p.printTable(p.reports[k])
 		}
 	}
+    defer s.Close()
 }
