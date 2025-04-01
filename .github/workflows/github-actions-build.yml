@@ -1,38 +1,28 @@
 name: Go Release on Tag
 
-# Controls when the workflow will run
 on:
   push:
     tags:
-      - 'v*.*.*' # Trigger on tags matching v<major>.<minor>.<patch> (e.g., v1.0.0, v2.3.4)
-      # You can adjust this pattern. Examples:
-      # - 'v*'        # Trigger on any tag starting with 'v'
-      # - 'release-*' # Trigger on tags starting with 'release-'
+      - 'v*.*.*'
 
 permissions:
-  contents: write # Needed to create releases and upload assets
+  contents: write
 
 jobs:
   build-and-release:
     name: Build and Release
-    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        # Use fetch-depth: 0 if you need to access Git history (e.g., for changelogs)
-        # fetch-depth: 0
 
-      # 2. Set up Go environment
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23' # Specify your desired Go version (or use 'stable')
-          # Optional: cache Go modules for faster builds
+          go-version: '1.23'
           cache: true
 
-      # 3. Get the version from the tag
-      # Extracts the tag name (e.g., "v1.0.0") and strips the leading 'v' for use in artifact names
       - name: Get version from tag
         id: get_version
         run: |
@@ -40,41 +30,15 @@ jobs:
           echo "VERSION=$VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      # 4. Build the Go application
-      # Replace './cmd/myapp' with the path to your main package
-      # Replace 'my-app-binary' with your desired output binary name
       - name: Build Go Application
-       env:
-          VERSION_VAR_PATH: main.version # Adjust this path to your Go variable for version injection
-          GOOS: linux                      # Specify target OS (optional, defaults to runner OS)
-          GOARCH: amd64                    # Specify target Arch (optional, defaults to runner Arch)
-          # CGO_ENABLED: 0                 # Optional: Disable CGO for static builds
-          # Construct the output binary filename including version and platform
-          BINARY_NAME: my-app-${VERSION}-${{ env.GOOS }}-${{ env.GOARCH }}
        run: |
           echo "Building version $VERSION..." #use shell variable here.
-          go build -v -ldflags="-s -w -X 'VERSION_VAR_PATH=${{ github.ref_name }}'" -o ${{ env.BINARY_NAME }} .
-      # 5. (Optional) Package the binary (e.g., into a zip or tar.gz)
-      # Makes it easier for users to download. Naming includes version and platform.
-      # - name: Package Binary
-      #   run: |
-      #     ARTIFACT_NAME="my-app-${{ env.VERSION }}-linux-amd64" # Adjust OS/ARCH if cross-compiling
-      #     tar czf "${ARTIFACT_NAME}.tar.gz" my-app-binary README.md LICENSE # Add other files like README, LICENSE
-      #     # Or use zip: zip "${ARTIFACT_NAME}.zip" my-app-binary README.md LICENSE
-      #     echo "ASSET_PATH=${ARTIFACT_NAME}.tar.gz" >> $GITHUB_ENV # Pass artifact path to release step
+          go build -v -ldflags="-s -w -X 'VERSION_VAR_PATH=${{ github.ref_name }}'" -o git-reports-${VERSION}-${{ env.GOOS }}-${{ env.GOARCH }} .
 
-      # 6. Create GitHub Release
-      # Uses the softprops/action-gh-release action to create the release
       - name: Create Release and Upload Asset
-        uses: softprops/action-gh-release@v1 # Consider checking for newer major versions (e.g., @v2)
+        uses: softprops/action-gh-release@v1
         with:
-          # The tag_name is automatically set to the tag that triggered the workflow (GITHUB_REF_NAME)
-          # name: Release ${{ github.ref_name }} # Customize the release title (defaults to tag name)
-          # body: | # Customize release notes
-          #   Release of version ${{ github.ref_name }}
-          #   See CHANGELOG.md for details.
-          # body_path: CHANGELOG.md # Path to a file containing release notes
-          draft: false # Set to true to create a draft release instead of publishing
-          prerelease: false # Set to true if the tag indicates a pre-release (e.g., v1.0.0-beta.1)
-          files: | # List of files (artifacts) to upload to the release
-            ${{ env.BINARY_NAME }} # Upload the raw binary directly            # Add other files if needed:
+          draft: false
+          prerelease: false
+          files: |
+            git-reports-${VERSION}-${{ env.GOOS }}-${{ env.GOARCH }}
