@@ -1,40 +1,34 @@
+---
 name: Go Release on Tag
-
 on:
   push:
     tags:
-      - 'v*.*.*'
-
+      - v*.*.*
 permissions:
   contents: write
-
 jobs:
   build-and-release:
     name: Build and Release
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23'
+          go-version: "1.23"
           cache: true
-
       - name: Get version from tag
         id: get_version
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           echo "VERSION=$VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-
       - name: Build Go Application
-       run: |
+        run: >
           echo "Building version $VERSION..." #use shell variable here.
-          go build -v -ldflags="-s -w -X 'VERSION_VAR_PATH=${{ github.ref_name }}'" -o git-reports-${VERSION}-${{ env.GOOS }}-${{ env.GOARCH }} .
 
+          go build -v -ldflags="-s -w -X 'VERSION_VAR_PATH=${{ github.ref_name }}'" -o git-reports-${VERSION}-${{ env.GOOS }}-${{ env.GOARCH }} .
       - name: Create Release and Upload Asset
         uses: softprops/action-gh-release@v1
         with:
@@ -42,3 +36,4 @@ jobs:
           prerelease: false
           files: |
             git-reports-${VERSION}-${{ env.GOOS }}-${{ env.GOARCH }}
+
