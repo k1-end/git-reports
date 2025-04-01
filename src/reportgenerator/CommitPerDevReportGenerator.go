@@ -4,19 +4,19 @@ import (
 	"sort"
 
 	"github.com/go-git/go-git/v5/plumbing/object"
-    "github.com/k1-end/git-visualizer/src/report"
+	"github.com/k1-end/git-visualizer/src/report"
 )
 
 type CommitsPerDevReportGenerator struct {
     CommitsPerDevMap map[string]int
 }
 
-func (r CommitsPerDevReportGenerator) LogIterationStep(c *object.Commit)  {
-    _, exists := r.CommitsPerDevMap[c.Author.Name]
+func (r CommitsPerDevReportGenerator) LogIterationStep(c *object.Commit, a Author)  {
+    _, exists := r.CommitsPerDevMap[a.Name]
     if !exists {
-        r.CommitsPerDevMap[c.Author.Name] = 1
+        r.CommitsPerDevMap[a.Name] = 1
     } else {
-        r.CommitsPerDevMap[c.Author.Name]++
+        r.CommitsPerDevMap[a.Name]++
     }
 }
 

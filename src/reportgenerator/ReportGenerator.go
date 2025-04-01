@@ -7,3 +7,9 @@ import (
 type ReportGenerator interface {
     GetReport() report.Report
 }
+
+type Author struct {
+    Name  string
+    Emails map[string]bool
+}
+

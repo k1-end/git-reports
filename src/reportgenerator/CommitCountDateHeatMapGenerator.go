@@ -13,7 +13,7 @@ type CommitCountDateHeatMapGenerator struct {
     CommitsMap map[string]int
 }
 
-func (r CommitCountDateHeatMapGenerator) LogIterationStep(c *object.Commit)  {
+func (r CommitCountDateHeatMapGenerator) LogIterationStep(c *object.Commit, a Author)  {
     year, month, date := c.Author.When.Local().Date()
     key := fmt.Sprintf("%d-%d-%d", year, month, date)
     _, exists := r.CommitsMap[key]

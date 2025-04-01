@@ -16,12 +16,12 @@ type GeneralInfoReportGenerator struct {
     contributors map[string]bool // email => true
 }
 
-func (r *GeneralInfoReportGenerator) LogIterationStep(c *object.Commit)  {
-    if r.contributors == nil { // Check if the map is nil
-        r.contributors = make(map[string]bool) // Initialize the map
+func (r *GeneralInfoReportGenerator) LogIterationStep(c *object.Commit, a Author)  {
+    if r.contributors == nil {
+        r.contributors = make(map[string]bool)
     }
-	if _, exists := r.contributors[c.Author.Email]; !exists {
-        r.contributors[c.Author.Email] = true
+	if _, exists := r.contributors[a.Name]; !exists {
+        r.contributors[a.Name] = true
         r.ContributorsNo += 1
     }
     r.CommitsNo += 1

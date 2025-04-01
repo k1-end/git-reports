@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/go-git/go-git/v5"
@@ -21,6 +23,8 @@ var path string
 var printerOption string
 var outputPath string
 var Version string
+
+var authors = make(map[string]*reportgenerator.Author)
 
 var rootCmd = &cobra.Command{
 	Use:   "git-reports [options]",
@@ -65,6 +69,15 @@ var rootCmd = &cobra.Command{
             }
         }
 
+        mailmapAuthors, err := ParseMailmapCommitEmailsAndName(path)
+        checkIfError(err)
+        for _, mailmapAuthor := range mailmapAuthors {
+            for email := range mailmapAuthor.Emails {
+                authors[email] = &mailmapAuthor
+                
+            }
+        }
+
 		commitCountDateHeatMapGenerator := reportgenerator.CommitCountDateHeatMapGenerator{CommitsMap: make(map[string]int)}
 		commitsPerDevReportGenerator := reportgenerator.CommitsPerDevReportGenerator{CommitsPerDevMap: make(map[string]int)}
 		commitsPerHourReportGenerator := reportgenerator.CommitsPerHourReportGenerator{CommitsPerHourMap: make([]int, 24)}
@@ -87,10 +100,18 @@ var rootCmd = &cobra.Command{
 		checkIfError(err)
 
 		_ = cIter.ForEach(func(c *object.Commit) error {
+            if _, exists := authors[c.Author.Email]; !exists {
+                authors[c.Author.Email] = &reportgenerator.Author{
+                    Name: c.Author.Name,
+                    Emails: map[string]bool{c.Author.Email: true},
+                }
+            }
+
 			if developerEmail != "_" {
-				if c.Author.Email != developerEmail {
-					return nil
-				}
+                selectedAuthor, _ := authors[developerEmail];
+                if selectedAuthor != authors[c.Author.Email] {
+                    return nil
+                }
 			}
 
 			// Filter by date range
@@ -102,11 +123,11 @@ var rootCmd = &cobra.Command{
 				return nil
 			}
 
-			commitCountDateHeatMapGenerator.LogIterationStep(c)
-			commitsPerDevReportGenerator.LogIterationStep(c)
-			commitsPerHourReportGenerator.LogIterationStep(c)
-			mergeCommitsPerYearReportGenerator.LogIterationStep(c)
-            generalInfoReportGenerator.LogIterationStep(c)
+			commitCountDateHeatMapGenerator.LogIterationStep(c, *authors[c.Author.Email])
+			commitsPerDevReportGenerator.LogIterationStep(c, *authors[c.Author.Email])
+			commitsPerHourReportGenerator.LogIterationStep(c, *authors[c.Author.Email])
+			mergeCommitsPerYearReportGenerator.LogIterationStep(c, *authors[c.Author.Email])
+            generalInfoReportGenerator.LogIterationStep(c, *authors[c.Author.Email])
 
 			return nil
 		})
@@ -241,4 +262,70 @@ func expandTilde(path string) (string, error) {
                 return filepath.Join(homeDir, path[1:]), nil
         }
         return path, nil
+}
+
+func ParseMailmapCommitEmailsAndName(path string) ([]reportgenerator.Author, error) {
+        file, err := os.Open(path + "/.mailmap")
+        if err != nil {
+                return nil, err
+        }
+        defer file.Close()
+
+        scanner := bufio.NewScanner(file)
+        authors := []reportgenerator.Author{}
+        lineNum := 0
+
+        for scanner.Scan() {
+                lineNum++
+                line := scanner.Text()
+                line = strings.TrimSpace(line)
+
+                if line == "" || strings.HasPrefix(line, "#") {
+                        continue
+                }
+
+                author, err := parseMailmapLineCommitEmailsAndName(line)
+                if err != nil {
+                        return nil, errors.New(err.Error() + " on line " + string(rune(lineNum + '0')))
+                }
+                authors = append(authors, author)
+        }
+
+        if err := scanner.Err(); err != nil {
+                return nil, err
+        }
+
+        return authors, nil
+}
+
+func parseMailmapLineCommitEmailsAndName(line string) (reportgenerator.Author, error) {
+        author := reportgenerator.Author{
+                Emails: make(map[string]bool),
+        }
+
+        parts := strings.Fields(line)
+
+        if len(parts) == 0 {
+                return author, errors.New("Invalid mailmap line syntax: Empty line")
+        }
+
+        emailFound := false;
+        properNameParts := []string{};
+
+        for _, part := range parts {
+                if strings.HasPrefix(part, "<") && strings.HasSuffix(part, ">") {
+                        author.Emails[strings.Trim(part, "<>")] = true
+                        emailFound = true;
+                } else{
+                        properNameParts = append(properNameParts, part);
+                }
+        }
+
+        author.Name = strings.Join(properNameParts, " ");
+
+        if !emailFound {
+                return author, errors.New("Invalid mailmap line syntax: No commit emails found")
+        }
+
+        return author, nil
 }
