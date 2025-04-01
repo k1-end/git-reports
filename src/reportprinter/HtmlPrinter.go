@@ -174,6 +174,15 @@ func (p HtmlPrinter) Print(s *os.File) {
 		panic(err)
 	}
 
+	var anon struct {
+		ProjectTitle    string
+		RenderedReports template.HTML
+        Reports []struct {
+            Title string
+            Id string
+        }
+	}
+
 	var renderedReports bytes.Buffer
 	for k := range p.reports {
 		switch p.reports[k].GetReportType() {
@@ -185,12 +194,15 @@ func (p HtmlPrinter) Print(s *os.File) {
 			renderedReports.WriteString(p.renderTable(p.reports[k], k))
 		}
 		renderedReports.WriteString("\n")
+        anon.Reports = append(anon.Reports, struct {
+            Title string
+            Id string
+        }{
+                Title: p.reports[k].GetTitle(), 
+                Id: "elem-" + strconv.Itoa(k),
+            })
 	}
 
-	var anon struct {
-		ProjectTitle    string
-		RenderedReports template.HTML
-	}
 	anon.ProjectTitle = p.GetProjectTitle()
 	anon.RenderedReports = template.HTML(renderedReports.String())
 	err = tmpl.Execute(s, anon)
