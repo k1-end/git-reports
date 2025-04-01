@@ -43,13 +43,16 @@ jobs:
       # Replace './cmd/myapp' with the path to your main package
       # Replace 'my-app-binary' with your desired output binary name
       - name: Build Go Application
+       env:
+          VERSION_VAR_PATH: main.version # Adjust this path to your Go variable for version injection
+          GOOS: linux                      # Specify target OS (optional, defaults to runner OS)
+          GOARCH: amd64                    # Specify target Arch (optional, defaults to runner Arch)
+          # CGO_ENABLED: 0                 # Optional: Disable CGO for static builds
+          # Construct the output binary filename including version and platform
+          BINARY_NAME: my-app-${{ env.VERSION }}-${{ env.GOOS }}-${{ env.GOARCH }}
         run: |
           echo "Building version ${{ env.VERSION }}..."
-          go build -v -ldflags="-s -w -X 'main.version=${{ github.ref_name }}'" .
-          # -v: verbose output
-          # -ldflags="-s -w": Strips debug symbols and DWARF information to reduce binary size (optional)
-          # -o my-app-binary: Output file name
-          # ./cmd/git-reports: Path to your main Go package (adjust as needed)
+          go build -v -ldflags="-s -w -X 'VERSION_VAR_PATH=${{ github.ref_name }}'" -o ${{ env.BINARY_NAME }} .
 
       # 5. (Optional) Package the binary (e.g., into a zip or tar.gz)
       # Makes it easier for users to download. Naming includes version and platform.
@@ -74,8 +77,4 @@ jobs:
           draft: false # Set to true to create a draft release instead of publishing
           prerelease: false # Set to true if the tag indicates a pre-release (e.g., v1.0.0-beta.1)
           files: | # List of files (artifacts) to upload to the release
-            ${{ env.ASSET_PATH }}
-            # Add other files if needed:
-            # my-other-artifact.zip
-        # env:
-        #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Automatically provided by GitHub Actions, has necessary permissions if 'contents: write' is set
+            ${{ env.BINARY_NAME }} # Upload the raw binary directly            # Add other files if needed:
