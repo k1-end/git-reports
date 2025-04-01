@@ -10,7 +10,6 @@ import (
 
 	"github.com/k1-end/git-visualizer/src/report"
 	"github.com/pterm/pterm"
-	"golang.org/x/term"
 )
 
 var shortDayNames = []string{
@@ -81,7 +80,7 @@ func (y yearData) print() {
 	}
 
 	newHeader.WithFullWidth().Println(y.Year)
-	width, _, _ := term.GetSize(int(os.Stdout.Fd()))
+	width := pterm.GetTerminalWidth()
 	monthW := 6
 	offset := 1 + 5
 	for {
@@ -249,6 +248,7 @@ func (p ConsolePrinter) printDateHeatMapChart(c report.Report) {
 }
 
 func (p *ConsolePrinter) Print(s *os.File) {
+    pterm.FallbackTerminalWidth = 100
 	for k := range p.reports {
 		switch p.reports[k].GetReportType() {
 		case "bar_chart":
