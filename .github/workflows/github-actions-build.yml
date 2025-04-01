@@ -28,12 +28,12 @@ jobs:
         run: >
           echo "Building version $VERSION..." #use shell variable here.
 
-          go build -v -ldflags="-s -w -X 'main.version=${{ github.ref_name }}'" -o git-reports-${VERSION}-${{ env.GOOS }}-${{ env.GOARCH }} .
+          go build -v -ldflags="-s -w -X 'main.version=${{ github.ref_name }}'" -o git-reports .
       - name: Create Release and Upload Asset
         uses: softprops/action-gh-release@v1
         with:
           draft: false
           prerelease: false
           files: |
-            git-reports-${VERSION}-${{ env.GOOS }}-${{ env.GOARCH }}
+            git-reports
 
