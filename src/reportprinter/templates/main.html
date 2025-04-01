@@ -23,6 +23,11 @@
             padding: 48px 0 0; /* Height of navbar */
             box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
         }
+        @media print {
+          .no-print{
+            display:none;
+          }
+        }
         </style>
 
     </head>
@@ -58,6 +63,13 @@
                     <script src="https://unpkg.com/cal-heatmap/dist/plugins/Tooltip.min.js"></script>
                     <script src="https://unpkg.com/cal-heatmap/dist/plugins/LegendLite.min.js"></script>
                     <script src="https://unpkg.com/cal-heatmap/dist/plugins/CalendarLabel.min.js"></script>
+                    <div class="d-flex justify-content-end flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                          <div class="btn-group me-2">
+                            <button onclick="window.print();" type="button" class="btn btn-sm btn-outline-secondary no-print">Print</button>
+                          </div>
+                        </div>
+                      </div>
                     {{.RenderedReports}}
                 </main>
             </div>
