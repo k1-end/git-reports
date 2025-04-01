@@ -53,12 +53,12 @@ jobs:
 
       # 5. (Optional) Package the binary (e.g., into a zip or tar.gz)
       # Makes it easier for users to download. Naming includes version and platform.
-      - name: Package Binary
-        run: |
-          ARTIFACT_NAME="my-app-${{ env.VERSION }}-linux-amd64" # Adjust OS/ARCH if cross-compiling
-          tar czf "${ARTIFACT_NAME}.tar.gz" my-app-binary README.md LICENSE # Add other files like README, LICENSE
-          # Or use zip: zip "${ARTIFACT_NAME}.zip" my-app-binary README.md LICENSE
-          echo "ASSET_PATH=${ARTIFACT_NAME}.tar.gz" >> $GITHUB_ENV # Pass artifact path to release step
+      # - name: Package Binary
+      #   run: |
+      #     ARTIFACT_NAME="my-app-${{ env.VERSION }}-linux-amd64" # Adjust OS/ARCH if cross-compiling
+      #     tar czf "${ARTIFACT_NAME}.tar.gz" my-app-binary README.md LICENSE # Add other files like README, LICENSE
+      #     # Or use zip: zip "${ARTIFACT_NAME}.zip" my-app-binary README.md LICENSE
+      #     echo "ASSET_PATH=${ARTIFACT_NAME}.tar.gz" >> $GITHUB_ENV # Pass artifact path to release step
 
       # 6. Create GitHub Release
       # Uses the softprops/action-gh-release action to create the release
