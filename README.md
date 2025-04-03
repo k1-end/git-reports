@@ -26,11 +26,25 @@ Git Reports is a command-line tool written in Go that helps you analyze and visu
 - **Merge Commits Per Year**: Track merge activity trends over the years.
 - **File Type Analysis**: Understand which file types are most frequently changed.
 - **Date Range Filtering**: Analyze commits within a specific date range.
+- **HTML Output**: Generate reports in HTML format for easy sharing.
 
 ---
 
 ## 🛠️ Installation
 
+### Option 1: Download Pre-built Binaries
+1. Visit the [releases page](https://github.com/k1-end/git-reports/releases)
+2. Download the appropriate binary for your operating system (Windows, macOS, or Linux)
+3. Make the binary executable (on Unix-like systems):
+   ```bash
+   chmod +x git-reports
+   ```
+4. Run the tool:
+   ```bash
+   ./git-reports
+   ```
+
+### Option 2: Build from Source
 1. Make sure you have Go installed (version 1.16 or higher).
 2. Clone this repository:
    ```bash
@@ -43,7 +57,7 @@ Git Reports is a command-line tool written in Go that helps you analyze and visu
    ```
 4. Run the tool:
    ```bash
-   ./git-reports /path/to/your/git/repo
+   ./git-reports
    ```
 
 ---
@@ -53,25 +67,56 @@ Git Reports is a command-line tool written in Go that helps you analyze and visu
 ### Basic Usage
 To generate reports for a Git repository, simply run:
 ```bash
-./git-reports /path/to/your/git/repo
+./git-reports
+```
+By default, it will analyze the current directory.
+
+### Specify Repository Path
+To analyze a specific Git repository, use the `--path` flag:
+```bash
+./git-reports --path /path/to/your/git/repo
+```
+
+### Choose Output Format
+You can choose between console (default) and HTML output using the `--printer` flag:
+```bash
+./git-reports --printer html
+```
+
+### Save Output to File
+To save the report to a file, use the `--output` flag:
+```bash
+./git-reports --output report.html
 ```
 
 ### Filter by Developer
 To analyze commits by a specific developer, use the `--dev` flag:
 ```bash
-./git-reports /path/to/your/git/repo --dev developer@example.com
+./git-reports --dev developer@example.com
 ```
 
 ### Filter by Date Range
 To analyze commits within a specific date range, use the `--from` and `--to` flags (format: `YYYY-MM-DD`):
 ```bash
-./git-reports /path/to/your/git/repo --from 2023-01-01 --to 2023-12-31
+./git-reports --from 2023-01-01 --to 2023-12-31
 ```
 
-### Combine Filters
-You can combine filters to analyze commits by a specific developer within a date range:
+### Combine Options
+You can combine multiple options:
 ```bash
-./git-reports /path/to/your/git/repo --dev developer@example.com --from 2023-01-01 --to 2023-12-31
+./git-reports --path /path/to/repo --dev developer@example.com --from 2023-01-01 --to 2023-12-31 --printer html --output report.html
+```
+
+### Check Version
+To check the version of Git Reports:
+```bash
+./git-reports --version
+```
+
+### Use console printer with a pager (less)
+In case you want to use the console printer with a pager, you can use the `less` command with -R option to allow ANSI colors:
+```bash
+./git-reports --printer console | less -R
 ```
 
 ---
