@@ -9,14 +9,29 @@ permissions:
 jobs:
   build-and-release:
     name: Build and Release
-    runs-on: ubuntu-latest
     strategy:
       matrix:
-        goos: [linux, windows]
-        goarch: [amd64]
-        exclude:
+        goos: [linux, windows, darwin]
+        goarch: [amd64, arm64]
+        include:
+          - goos: darwin
+            goarch: amd64
+            runs-on: macos-latest
+          - goos: darwin
+            goarch: arm64
+            runs-on: macos-latest
+          - goos: linux
+            goarch: amd64
+            runs-on: ubuntu-latest
+          - goos: linux
+            goarch: arm64
+            runs-on: ubuntu-latest
           - goos: windows
-            goarch: arm64 # Example of excluding a specific combination if needed
+            goarch: amd64
+            runs-on: windows-latest
+          - goos: windows
+            goarch: arm64
+            runs-on: windows-latest # Be aware of limited support for Windows ARM64 on GitHub-hosted runners
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,7 +49,7 @@ jobs:
       - name: Build Go Application
         run: |
           echo "Building for ${{ matrix.goos }}/${{ matrix.goarch }} version $VERSION..."
-          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -v -ldflags="-s -w -X 'main.version=${{ github.ref_name }}'" -o git-reports${{ matrix.goos == 'windows' && '.exe' || '' }} .
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -v -ldflags="-s -w -X 'main.version=${{ github.ref_name }}'" -o git-reports${{ runner.os == 'Windows' && '.exe' || '' }} .
       - name: Archive Binary
         run: |
           BINARY_NAME=git-reports${{ matrix.goos == 'windows' && '.exe' || '' }}
@@ -51,4 +66,8 @@ jobs:
           prerelease: false
           files: |
             git-reports_${{ env.VERSION }}_linux_amd64.tar.gz
+            git-reports_${{ env.VERSION }}_linux_arm64.tar.gz
             git-reports_${{ env.VERSION }}_windows_amd64.zip
+            git-reports_${{ env.VERSION }}_windows_arm64.zip
+            git-reports_${{ env.VERSION }}_darwin_amd64.tar.gz
+            git-reports_${{ env.VERSION }}_darwin_arm64.tar.gz
