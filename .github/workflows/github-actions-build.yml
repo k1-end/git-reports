@@ -37,8 +37,8 @@ jobs:
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -v -ldflags="-s -w -X 'main.version=${{ github.ref_name }}'" -o git-reports${{ runner.os == 'Windows' && '.exe' || '' }} .
       - name: Archive Binary
         run: |
-          BINARY_NAME=git-reports${{ runner.os == 'Windows' && '.exe' || '' }}
-          ARCHIVE_NAME=git-reports_${{ env.VERSION }}_${{ matrix.goos }}_${{ matrix.goarch }}${{ runner.os == 'Windows' && '.zip' || '.tar.gz' }}
+          BINARY_NAME=git-reports${{ matrix.goos == 'windows' && '.exe' || '' }}
+          ARCHIVE_NAME=git-reports_${{ env.VERSION }}_${{ matrix.goos }}_${{ matrix.goarch }}${{ matrix.goos == 'windows' && '.zip' || '.tar.gz' }}
           if [[ "${{ matrix.goos }}" == "windows" ]]; then
             zip $ARCHIVE_NAME $BINARY_NAME
           else
