@@ -8,11 +8,15 @@ Git Reports is a command-line tool written in Go that helps you analyze and visu
 ---
 
 ### Sample Output
-![Heatmap](https://i.imgur.com/UsvrfvA.png)
+![General Info and Heatmap](https://i.imgur.com/fbGmYp2.png)
+
+![General Info and Heatmap (HTML)](https://i.imgur.com/No3sPBg.png)
 
 ![Commits Per Developer](https://imgur.com/HKATglQ.png)
 
 ![Commits Per Hour Of Day](https://imgur.com/26rQknn.png)
+
+![Commits Per Hour Of Day (HTML)](https://i.imgur.com/feKTDrP.png)
 
 ![File Types & Merge Commits per year](https://imgur.com/uY0kJQ8.png)
 
