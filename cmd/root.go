@@ -263,7 +263,7 @@ func expandTilde(path string) (string, error) {
 func ParseMailmapCommitEmailsAndName(path string) ([]reportgenerator.Author, error) {
         file, err := os.Open(path + "/.mailmap")
         if err != nil {
-                return nil, err
+                return nil, nil // the .mailmap file is not required
         }
         defer file.Close()
 
