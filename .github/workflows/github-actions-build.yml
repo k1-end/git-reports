@@ -10,6 +10,13 @@ jobs:
   build-and-release:
     name: Build and Release
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, windows]
+        goarch: [amd64]
+        exclude:
+          - goos: windows
+            goarch: arm64 # Example of excluding a specific combination if needed
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,17 +32,23 @@ jobs:
           echo "VERSION=$VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
       - name: Build Go Application
-        run: >
-          echo "Building version $VERSION..." #use shell variable here.
-
-          go build -v -ldflags="-s -w -X 'main.version=${{ github.ref_name }}'" -o git-reports .
+        run: |
+          echo "Building for ${{ matrix.goos }}/${{ matrix.goarch }} version $VERSION..."
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -v -ldflags="-s -w -X 'main.version=${{ github.ref_name }}'" -o git-reports${{ runner.os == 'Windows' && '.exe' || '' }} .
       - name: Archive Binary
-        run: tar czvf git-reports_${{ env.VERSION }}_linux_amd64.tar.gz git-reports
-      - name: Create Release and Upload Asset
+        run: |
+          BINARY_NAME=git-reports${{ runner.os == 'Windows' && '.exe' || '' }}
+          ARCHIVE_NAME=git-reports_${{ env.VERSION }}_${{ matrix.goos }}_${{ matrix.goarch }}${{ runner.os == 'Windows' && '.zip' || '.tar.gz' }}
+          if [[ "${{ matrix.goos }}" == "windows" ]]; then
+            zip $ARCHIVE_NAME $BINARY_NAME
+          else
+            tar czvf $ARCHIVE_NAME $BINARY_NAME
+          fi
+      - name: Create Release and Upload Assets
         uses: softprops/action-gh-release@v1
         with:
           draft: false
           prerelease: false
           files: |
             git-reports_${{ env.VERSION }}_linux_amd64.tar.gz
-
+            git-reports_${{ env.VERSION }}_windows_amd64.zip
