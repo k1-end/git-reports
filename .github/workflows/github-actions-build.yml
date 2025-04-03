@@ -9,6 +9,7 @@ permissions:
 jobs:
   build-and-release:
     name: Build and Release
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         goos: [linux, windows, darwin]
@@ -16,22 +17,16 @@ jobs:
         include:
           - goos: darwin
             goarch: amd64
-            runs-on: macos-latest
           - goos: darwin
             goarch: arm64
-            runs-on: macos-latest
           - goos: linux
             goarch: amd64
-            runs-on: ubuntu-latest
           - goos: linux
             goarch: arm64
-            runs-on: ubuntu-latest
           - goos: windows
             goarch: amd64
-            runs-on: windows-latest
           - goos: windows
             goarch: arm64
-            runs-on: windows-latest # Be aware of limited support for Windows ARM64 on GitHub-hosted runners
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
