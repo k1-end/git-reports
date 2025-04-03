@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/k1-end/git-visualizer/src/reportgenerator"
 	"github.com/k1-end/git-visualizer/src/reportprinter"
@@ -22,6 +23,7 @@ var toDate string
 var path string
 var printerOption string
 var outputPath string
+var branch string
 var Version string
 
 var authors = make(map[string]*reportgenerator.Author)
@@ -90,6 +92,21 @@ var rootCmd = &cobra.Command{
 		checkIfError(err)
 
 		ref, err := r.Head()
+
+        if branch != ""  {
+            refName := plumbing.ReferenceName(fmt.Sprintf("refs/heads/%s", branch))
+
+            ref, err = r.Reference(refName, false)
+            if err != nil {
+                if err == plumbing.ErrReferenceNotFound {
+                    fmt.Printf("Local branch '%s' does not exist\n", branch)
+                } else {
+                    fmt.Printf("Error checking local branch '%s': %v\n", branch, err)
+                }
+                os.Exit(1)
+            }
+        }
+
 		checkIfError(err)
 
 		cIter, err := r.Log(&git.LogOptions{From: ref.Hash()})
@@ -183,6 +200,7 @@ func init() {
     rootCmd.PersistentFlags().StringVarP(&developerEmail, "dev", "d", "_", "choose developer by email")
     rootCmd.PersistentFlags().StringVarP(&fromDate, "from", "f", "", "Filter commits from this date (format: YYYY-MM-DD)")
     rootCmd.PersistentFlags().StringVarP(&toDate, "to", "t", "", "Filter commits up to this date (format: YYYY-MM-DD)")
+    rootCmd.PersistentFlags().StringVarP(&branch, "branch", "b", "", "Set the branch to analyze")
     rootCmd.PersistentFlags().StringVar(&printerOption, "printer", "console", "Printer (default to console) (available options are console and html)")
     rootCmd.PersistentFlags().StringVar(&outputPath, "output", "", "Output path for the report")
 
