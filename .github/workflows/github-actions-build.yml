@@ -38,7 +38,7 @@ jobs:
       - name: Archive Binary
         run: |
           BINARY_NAME=git-reports${{ matrix.goos == 'windows' && '.exe' || '' }}
-          ARCHIVE_NAME=git-reports_${{ env.VERSION }}_${{ matrix.goos }}_${{ matrix.goarch }}${{ matrix.goos == 'windows' && '.zip' || '.tar.gz' }}
+          ARCHIVE_NAME=git-reports_${{ env.VERSION }}_${{ matrix.goos }}_${{ matrix.goarch }}${{ matrix.goos == 'windows' && '' || '.tar.gz' }}
           if [[ "${{ matrix.goos }}" == "windows" ]]; then
             zip $ARCHIVE_NAME $BINARY_NAME
           else
