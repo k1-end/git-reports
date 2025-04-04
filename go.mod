@@ -1,4 +1,4 @@
-module github.com/k1-end/git-visualizer
+module github.com/k1-end/git-reports
 
 go 1.23.0
 

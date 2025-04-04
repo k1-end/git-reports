@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/k1-end/git-visualizer/src/report"
+	"github.com/k1-end/git-reports/src/report"
 	"github.com/pterm/pterm"
 )
 

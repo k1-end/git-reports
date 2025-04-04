@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/go-git/go-git/v5/plumbing/object"
-	"github.com/k1-end/git-visualizer/src/report"
+	"github.com/k1-end/git-reports/src/report"
 )
 
 type CommitsPerHourReportGenerator struct {

@@ -12,8 +12,8 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
-	"github.com/k1-end/git-visualizer/src/reportgenerator"
-	"github.com/k1-end/git-visualizer/src/reportprinter"
+	"github.com/k1-end/git-reports/src/reportgenerator"
+	"github.com/k1-end/git-reports/src/reportprinter"
 	"github.com/spf13/cobra"
 )
 

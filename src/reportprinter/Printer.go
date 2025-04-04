@@ -3,7 +3,7 @@ package reportprinter
 import (
 	"os"
 
-	"github.com/k1-end/git-visualizer/src/report"
+	"github.com/k1-end/git-reports/src/report"
 )
 
 type Printer interface {

@@ -1,7 +1,7 @@
 package reportgenerator
 
 import (
-	"github.com/k1-end/git-visualizer/src/report"
+	"github.com/k1-end/git-reports/src/report"
 )
 
 type ReportGenerator interface {
