@@ -14,6 +14,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/k1-end/git-reports/src/reportgenerator"
 	"github.com/k1-end/git-reports/src/reportprinter"
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
@@ -36,6 +37,7 @@ var rootCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 
+        spinnerLiveText, _ := pterm.DefaultSpinner.WithRemoveWhenDone().Start("Processing the repository")
 		var fromTime, toTime time.Time
 		var err error
 		if fromDate != "" {
@@ -160,6 +162,7 @@ var rootCmd = &cobra.Command{
 		absolutePath, _ := filepath.Abs(path)
 		dirName := filepath.Base(absolutePath)
 
+        spinnerLiveText.Stop()
 		p := getPrinter(printerOption)
 		p.RegisterReport(generalInfoReportGenerator.GetReport())
 		p.RegisterReport(commitCountDateHeatMapGenerator.GetReport())
