@@ -53,6 +53,17 @@ range: {{.Range}}
         gutter: 4,
       },
     ],
+    [
+      CalendarLabel,
+      {
+        position: 'left',
+        key: 'left',
+        text: () => ['Sun', '', 'Tue', '', '', 'Fri', ''],
+        textAlign: 'end',
+        width: 30,
+        padding: [0, 5, 0, 0],
+      },
+    ],
   ]
 );
 </script>
