@@ -233,40 +233,49 @@ func Execute() {
 // isValidFilePath checks if the given path is valid for creating a file.
 // It checks if the parent directory exists and is writable.
 func isValidFilePath(filePath string) bool {
-        // Expand tilde
-        expandedPath, err := expandTilde(filePath)
-        if err != nil {
-                return false
-        }
+    // Expand tilde
+    expandedPath, err := expandTilde(filePath)
+    if err != nil {
+        return false
+    }
 
-        // Get the directory part of the path.
-        dir := filepath.Dir(expandedPath)
+    fileInfo, err := os.Stat(expandedPath)
+    if err != nil {
+        return false
+    }
+    if fileInfo.IsDir() {
+        return false
 
-        // Check if the directory exists.
-        fileInfo, err := os.Stat(dir)
-        if os.IsNotExist(err) {
-                return false // Directory does not exist
-        }
+    }
 
-        if err != nil {
-                return false // Other error during Stat
-        }
+    // Get the directory part of the path.
+    dir := filepath.Dir(expandedPath)
 
-        // Check if it's a directory.
-        if !fileInfo.IsDir() {
-                return false // Parent is not a directory
-        }
+    // Check if the directory exists.
+    dirInfo, err := os.Stat(dir)
+    if os.IsNotExist(err) {
+        return false // Directory does not exist
+    }
 
-        // Check write permissions for the directory.
-        testFile := filepath.Join(dir, ".testwrite")
-        err = os.WriteFile(testFile, []byte("test"), 0600)
-        if err != nil {
-                return false // Write permission denied
-        }
+    if err != nil {
+        return false // Other error during Stat
+    }
 
-        os.Remove(testFile)
+    // Check if it's a directory.
+    if !dirInfo.IsDir() {
+        return false // Parent is not a directory
+    }
 
-        return true
+    // Check write permissions for the directory.
+    testFile := filepath.Join(dir, ".testwrite")
+    err = os.WriteFile(testFile, []byte("test"), 0600)
+    if err != nil {
+        return false // Write permission denied
+    }
+
+    os.Remove(testFile)
+
+    return true
 }
 
 // expandTilde expands a tilde (~) in a file path to the user's home directory.
