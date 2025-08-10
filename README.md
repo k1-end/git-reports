@@ -135,6 +135,41 @@ In case you want to use the console printer with a pager, you can use the `less`
 
 ---
 
+🔧 Solving Common Author Identity Problems
+
+Have you ever noticed that a single developer appears with multiple different names or emails in your git history? This can happen when a developer uses a personal email for some commits and a work email for others, or a name with slightly different capitalization.
+
+This can skew your reports, making it look like you have more contributors than you actually do, or misattributing a developer's total commits.
+
+Git Reports now supports .mailmap files, a powerful git feature that maps multiple author identities to a single canonical name and email. By including a .mailmap file in your repository, you can ensure that all reports accurately reflect the true identity of each contributor, providing a cleaner and more accurate overview of your repository's activity.
+
+How it Works
+
+When you run git-reports, it will automatically look for a .mailmap file in your repository's root directory. If found, it will use the mappings defined in the file to normalize author names and emails before generating the reports.
+
+Example .mailmap File
+
+A .mailmap file is a simple text file where each line defines a mapping. The syntax is flexible, but a common format is:
+
+```Plaintext
+Canonical Name <canonical@email.com> [Alias Name] <alias@email.com>
+```
+
+Here's an example:
+
+
+```Plaintext
+John Doe <john.doe@example.com> John D. <john.d@old-company.com>
+John Doe <john.doe@example.com> <johndoe@personal-email.net>
+Jane Smith <jane.smith@example.com> Jane S. <jane.smith@new-company.com>
+```
+
+In this example, all commits made by john.d@old-company.com and johndoe@personal-email.net will be attributed to John Doe john.doe@example.com. The same logic applies to Jane Smith.
+
+With this .mailmap file in your repository, git-reports will now produce consolidated and accurate reports for all your developers.
+
+---
+
 ## 🤝 Contributing
 
 We welcome contributions! If you'd like to improve Git Reports, please follow these steps:
