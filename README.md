@@ -125,7 +125,7 @@ In case you want to use the console printer with a pager, you can use the `less`
 
 ---
 
-## 🧑‍💻 Why Use Git Reports?
+## 🧑💻 Why Use Git Reports?
 
 - **Insightful Metrics**: Gain a deeper understanding of your repository's activity.
 - **Easy to Use**: Simple CLI interface with no dependencies other than Go.
@@ -135,7 +135,7 @@ In case you want to use the console printer with a pager, you can use the `less`
 
 ---
 
-🔧 Solving Common Author Identity Problems
+## 🔧 Solving Common Author Identity Problems
 
 Have you ever noticed that a single developer appears with multiple different names or emails in your git history? This can happen when a developer uses a personal email for some commits and a work email for others, or a name with slightly different capitalization.
 
